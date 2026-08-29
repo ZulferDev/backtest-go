@@ -1,6 +1,6 @@
 package validator
 
-import "backtest-go/pkg/data"
+import "github.com/ZulferDev/backtest-go/pkg/data"
 
 // CheckGaps checks for timestamp gaps in ms based on timeframe duration in ms
 func CheckGaps(series []data.OHLCV, expectedIntervalMs int64) []int {

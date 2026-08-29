@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"backtest-go/internal/exchange/binance"
-	"backtest-go/internal/exchange/bybit"
-	"backtest-go/internal/normalizer"
-	"backtest-go/internal/validator"
+	"github.com/ZulferDev/backtest-go/internal/exchange/binance"
+	"github.com/ZulferDev/backtest-go/internal/exchange/bybit"
+	"github.com/ZulferDev/backtest-go/internal/normalizer"
+	"github.com/ZulferDev/backtest-go/internal/validator"
 )
 
 func main() {

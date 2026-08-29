@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"backtest-go/pkg/data"
+	"github.com/ZulferDev/backtest-go/pkg/data"
 )
 
 type Client struct {

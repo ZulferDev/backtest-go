@@ -2,7 +2,7 @@ package datafetcher
 
 import (
 	"context"
-	"backtest-go/pkg/data"
+	"github.com/ZulferDev/backtest-go/pkg/data"
 )
 
 // Fetcher defines the interface for exchange clients

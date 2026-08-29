@@ -1,7 +1,7 @@
 package normalizer
 
 import (
-	"backtest-go/pkg/data"
+	"github.com/ZulferDev/backtest-go/pkg/data"
 )
 
 // ToChronological ensures the data is sorted by Timestamp ascending

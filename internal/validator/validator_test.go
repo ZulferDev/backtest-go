@@ -2,7 +2,7 @@ package validator
 
 import (
 	"testing"
-	"backtest-go/pkg/data"
+	"github.com/ZulferDev/backtest-go/pkg/data"
 )
 
 func TestValidateOHLCV(t *testing.T) {

@@ -3,7 +3,7 @@ package cache
 import (
 	"os"
 	"testing"
-	"backtest-go/pkg/data"
+	"github.com/ZulferDev/backtest-go/pkg/data"
 )
 
 func TestJSONStorage(t *testing.T) {
