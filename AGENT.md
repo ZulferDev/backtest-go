@@ -1,140 +1,377 @@
-# AGENT.md — Crypto Backtesting Framework
+# AGENT.md — Framework Backtesting Crypto
 
-## Project Identity
+## Identitas Proyek
 
-**Name:** backtest-go  
-**Language:** Golang  
-**Purpose:** High-performance cryptocurrency trading strategy backtesting framework  
-**Owner:** Fajar Hadi Tama  
-**Created:** 2026-08-29  
-
----
-
-## Vision
-
-Build a zero-bloat, production-ready backtesting engine for crypto trading strategies with:
-- **Speed**: Vectorized operations where possible, concurrent data processing
-- **Accuracy**: Realistic order execution (slippage, fees, latency simulation)
-- **Extensibility**: Plugin-based strategy system, custom indicator support
-- **Observability**: Rich metrics, equity curves, trade-level analysis
+**Nama:** backtest-go  
+**Bahasa:** Golang  
+**Tujuan:** Framework backtesting strategi trading cryptocurrency dengan performa tinggi  
+**Pemilik:** Fajar Hadi Tama  
+**Dibuat:** 2026-08-29  
 
 ---
 
-## Architecture Principles
+## Visi
 
-1. **Separation of Concerns**
-   - Data layer: fetch, store, validate
-   - Strategy layer: signal generation, indicator composition
-   - Execution layer: order simulation, position management
-   - Analytics layer: performance metrics, visualization
+Membangun mesin backtesting yang production-ready untuk strategi trading crypto dengan fokus:
+- **Kecepatan**: Operasi tervektorisasi, pemrosesan data concurrent
+- **Akurasi**: Eksekusi order realistis (slippage, fee, simulasi latensi)
+- **Ekstensibilitas**: Sistem strategi berbasis plugin, dukungan indikator custom
+- **Observabilitas**: Metrik lengkap, equity curve, analisis per-trade
+
+---
+
+## Prinsip Arsitektur
+
+1. **Pemisahan Concern**
+   - Layer data: fetch, simpan, validasi
+   - Layer strategi: generasi sinyal, komposisi indikator
+   - Layer eksekusi: simulasi order, manajemen posisi
+   - Layer analitik: metrik performa, visualisasi
 
 2. **Performance First**
-   - Minimize allocations in hot paths
-   - Use sync.Pool for frequently allocated objects
-   - Benchmark-driven optimization
+   - Minimalisir alokasi di hot path
+   - Gunakan sync.Pool untuk objek yang sering dialokasikan
+   - Optimisasi berbasis benchmark
 
 3. **Testability**
-   - Every component has unit tests
-   - Integration tests for end-to-end flows
-   - Property-based testing for edge cases
+   - Setiap komponen punya unit test
+   - Integration test untuk flow end-to-end
+   - Property-based testing untuk edge case
 
 4. **Production-Ready**
-   - Configuration via YAML/env
+   - Konfigurasi via YAML/env
    - Structured logging (zerolog)
-   - Graceful error handling
+   - Error handling yang graceful
 
 ---
 
 ## Tech Stack
 
-| Component | Choice | Rationale |
-|-----------|--------|----------|
-| CLI | cobra | Standard, feature-rich |
-| Config | viper | Flexible format support |
-| HTTP | resty | Ergonomic, retry logic |
-| Storage | parquet-go | Columnar, efficient |
-| Math | gonum | Mature scientific computing |
-| Charts | go-echarts | HTML output, portable |
-| Logging | zerolog | Fast, structured |
+| Komponen | Pilihan | Alasan |
+|----------|---------|--------|
+| CLI | cobra | Standar, feature-rich |
+| Config | viper | Dukungan format fleksibel |
+| HTTP | resty | Ergonomis, retry logic |
+| Storage | parquet-go | Columnar, efisien |
+| Math | gonum | Mature, scientific computing |
+| Charts | go-echarts | Output HTML, portable |
+| Logging | zerolog | Cepat, terstruktur |
 | Testing | testify | Assertions, mocking |
 
 ---
 
-## Project Structure
+## Struktur Proyek
 
 ```
 backtest-go/
 ├── cmd/
-│   ├── backtest/         # Main CLI entrypoint
-│   └── fetch/            # Data downloader utility
+│   ├── backtest/         # CLI entrypoint utama
+│   └── fetch/            # Utility downloader data
 ├── pkg/
-│   ├── data/            # OHLCV fetchers, storage, validation
-│   ├── strategy/        # Strategy interface & base implementations
-│   ├── indicators/      # Technical indicators library
-│   ├── backtest/        # Engine, portfolio, order execution
-│   └── metrics/         # Performance analytics
+│   ├── data/            # Fetcher OHLCV, storage, validasi
+│   ├── strategy/        # Interface strategi & implementasi base
+│   ├── indicators/      # Library indikator teknikal
+│   ├── backtest/        # Engine, portfolio, eksekusi order
+│   └── metrics/         # Analitik performa
 ├── internal/
-│   └── util/            # Internal helpers
-├── strategies/          # User-defined strategy plugins
-├── testdata/            # Sample data for tests
-├── results/             # Backtest outputs
+│   └── util/            # Helper internal
+├── strategies/          # Plugin strategi user-defined
+├── testdata/            # Sample data untuk testing
+├── results/             # Output backtest
 ├── .gitignore
 ├── go.mod
 ├── go.sum
 ├── Makefile
-├── README.md
 └── AGENT.md
 ```
 
 ---
 
-## Development Phases
+## Fase Development
 
-### Phase 1: Foundation (Week 1-2)
-- [ ] Project scaffolding
-- [ ] Data fetcher (Binance REST API)
-- [ ] OHLCV storage (CSV, later Parquet)
-- [ ] Basic indicators (SMA, EMA, RSI, MACD)
-- [ ] Unit tests for data pipeline
+### Phase 1: Fondasi
+**Deliverable:**
+- [ ] Scaffolding proyek (go mod, struktur folder)
+- [ ] Data fetcher (Binance REST API dengan rate limiting)
+- [ ] Storage OHLCV (CSV dengan validasi schema)
+- [ ] Indikator dasar (SMA, EMA, RSI, MACD)
+- [ ] Unit test (coverage >80% untuk data pipeline)
 
-### Phase 2: Core Engine (Week 3-4)
+**Kriteria Sukses:**
+- Bisa fetch 1 tahun data BTCUSDT 1h dalam <30 detik
+- Semua indikator menghasilkan nilai yang benar (tervalidasi vs TradingView)
+
+**Penjelasan:**
+Fase ini membangun fondasi infrastruktur data dan library indikator. Tanpa data bersih, hasil backtest tidak bisa dipercaya (garbage in, garbage out). Indikator adalah building block untuk semua strategi.
+
+**Komponen Utama:**
+1. **Data Fetcher**: Client HTTP untuk Binance public API endpoint `/api/v3/klines`
+   - Rate limiting: 1200 req/min (sesuai limit Binance)
+   - Retry dengan exponential backoff
+   - Pagination untuk data >1000 bar
+
+2. **Storage CSV**: Format awal sebelum migrate ke Parquet
+   ```csv
+   timestamp,open,high,low,close,volume
+   1640995200000,46000.5,47500.0,45800.0,47200.0,1234.56
+   ```
+   - Validasi: timestamp monoton, harga tidak negatif
+   - Buffer untuk performance
+
+3. **Indikator Dasar**:
+   - **SMA**: Simple Moving Average (rolling window)
+   - **EMA**: Exponential MA (bobot lebih ke harga terbaru)
+   - **RSI**: Relative Strength Index (momentum oscillator 0-100)
+   - **MACD**: Moving Average Convergence Divergence (trend-following)
+
+---
+
+### Phase 2: Core Engine
+**Deliverable:**
 - [ ] Backtest engine (event-driven loop)
-- [ ] Portfolio manager (position tracking, PnL)
-- [ ] Order execution simulator (market orders)
-- [ ] Commission & slippage modeling
-- [ ] Integration tests
+- [ ] Portfolio manager (tracking posisi, PnL)
+- [ ] Order execution simulator (market order)
+- [ ] Modeling commission & slippage
+- [ ] Integration test
 
-### Phase 3: Analytics (Week 5-6)
-- [ ] Performance metrics (Sharpe, Sortino, drawdown)
-- [ ] Equity curve generation
-- [ ] Trade log export (JSON/CSV)
-- [ ] HTML report with charts
-- [ ] Walk-forward validation framework
+**Kriteria Sukses:**
+- Backtest buy-and-hold match dengan calculated return (selisih <0.1%)
+- Engine bisa proses 10,000 bar dalam <5 detik
 
-### Phase 4: Advanced Features (Week 7+)
-- [ ] Limit order simulation
-- [ ] Multi-timeframe strategies
-- [ ] Portfolio backtesting (multiple symbols)
-- [ ] Parameter optimization (grid search, genetic algo)
+**Penjelasan:**
+Ini "jantung" framework. Engine harus event-driven (proses bar-by-bar) untuk hindari look-ahead bias. Realisme penting: eksekusi yang terlalu optimis = false confidence.
+
+**Komponen Utama:**
+1. **Event-Driven Loop**:
+   ```go
+   for _, bar := range historicalData {
+       signal := strategy.OnBar(bar)  // Strategi generate sinyal
+       portfolio.ProcessSignal(signal, bar)  // Eksekusi
+       portfolio.UpdateEquity(bar.Close)  // Update equity
+   }
+   ```
+   - Tidak boleh "peek" ke data masa depan
+   - Semua indikator dan strategi operasi pada timestamp yang sama
+
+2. **Portfolio Manager**:
+   ```go
+   type Position struct {
+       Symbol     string
+       Size       float64    // jumlah unit
+       EntryPrice float64
+       EntryTime  time.Time
+       StopLoss   float64    // opsional
+       TakeProfit float64    // opsional
+   }
+   ```
+   - Track posisi open/closed
+   - Hitung PnL: unrealized (posisi open) & realized (posisi closed)
+   - Track equity: `cash + unrealizedPnL`
+
+3. **Order Execution (Market Order)**:
+   ```
+   Fill Price = Current Close × (1 + slippage)
+   Commission = Fill Price × Size × Commission Rate
+   ```
+   - Market order: eksekusi langsung di harga saat ini
+   - Limit/stop order belum di-support (Phase 4)
+
+4. **Commission & Slippage**:
+   - Commission (default Binance Futures):
+     - Maker: 0.02% (0.0002)
+     - Taker: 0.04% (0.0004)
+   - Slippage: simulasi market impact
+     - Order kecil: ~0.01-0.05%
+     - Order besar: bisa 0.1%+ tergantung likuiditas
+
+---
+
+### Phase 3: Analitik
+**Deliverable:**
+- [ ] Metrik performa (Sharpe, Sortino, drawdown)
+- [ ] Generasi equity curve
+- [ ] Export trade log (JSON/CSV)
+- [ ] HTML report dengan chart
+- [ ] Framework walk-forward validation
+
+**Kriteria Sukses:**
+- Bisa generate report lengkap untuk strategi apapun dalam <1 menit
+- Semua metrik match dengan perhitungan manual (verified)
+
+**Penjelasan:**
+Metrik menentukan viabilitas strategi. Visualisasi reveal pattern yang tidak obvious dari raw number. Walk-forward validation paling mendekati performa real-world.
+
+**Komponen Utama:**
+1. **Metrik Performa**:
+
+   **a. Sharpe Ratio**
+   ```
+   Sharpe = (Mean Return - Risk-Free Rate) / Std Dev Returns
+   ```
+   - Ukur risk-adjusted return
+   - >1 = bagus, >2 = sangat bagus, >3 = excellent
+   - Annualized: kalikan √252 (trading days)
+
+   **b. Sortino Ratio**
+   ```
+   Sortino = (Mean Return - Risk-Free Rate) / Downside Deviation
+   ```
+   - Seperti Sharpe, tapi hanya penalize downside volatility
+   - Lebih realistis (upside volatility itu bagus)
+
+   **c. Maximum Drawdown (MDD)**
+   ```
+   MDD = (Trough Value - Peak Value) / Peak Value
+   ```
+   - Penurunan terburuk dari peak ke trough
+   - Penting: "berapa banyak saya bisa rugi?"
+   - Recovery time juga penting
+
+   **d. Win Rate**
+   ```
+   Win Rate = Winning Trades / Total Trades
+   ```
+   - Bukan satu-satunya metric (bisa 40% win rate tapi profitable)
+
+   **e. Profit Factor**
+   ```
+   Profit Factor = Gross Profit / Gross Loss
+   ```
+   - >1 = profitable, >2 = kuat
+
+2. **Equity Curve**:
+   - Plot equity over time
+   - Identifikasi:
+     - Smooth uptrend = strategi konsisten
+     - Sharp spike = luck atau overfitting
+     - Long flat period = strategi tidak work
+
+3. **Trade Log**:
+   ```json
+   {
+     "trades": [
+       {
+         "entry_time": "2023-01-15T10:00:00Z",
+         "exit_time": "2023-01-16T14:30:00Z",
+         "symbol": "BTCUSDT",
+         "side": "long",
+         "entry_price": 21500.0,
+         "exit_price": 22100.0,
+         "size": 0.5,
+         "pnl": 300.0,
+         "pnl_pct": 2.79,
+         "commission": 10.5
+       }
+     ]
+   }
+   ```
+   - Enable post-analysis di Python/R
+   - Audit trail: reproduce hasil backtest
+
+4. **HTML Report**:
+   - Equity curve (line chart)
+   - Drawdown chart (underwater plot)
+   - Monthly returns heatmap
+   - Trade distribution histogram
+   - Tabel summary metrik
+   - Gunakan `go-echarts` untuk interactive chart
+
+5. **Walk-Forward Validation**:
+   ```
+   Train Period 1 → Test Period 1 →
+   Train Period 2 → Test Period 2 →
+   ...
+   ```
+   - Cegah overfitting
+   - Lebih realistis dari single train/test split
+   - Contoh: train 6 bulan, test 1 bulan, roll forward
+
+---
+
+### Phase 4: Fitur Advanced
+**Deliverable:**
+- [ ] Simulasi limit order
+- [ ] Strategi multi-timeframe
+- [ ] Portfolio backtesting (multiple symbol)
+- [ ] Optimisasi parameter (grid search, genetic algo)
 - [ ] Live trading adapter (paper trading)
 
+**Kriteria Sukses:**
+- Strategi yang dioptimasi beat baseline >20% di walk-forward test
+- Paper trading berjalan 7 hari tanpa error
+
+**Penjelasan:**
+Fitur production-grade dan tools optimisasi. Limit order lebih realistis, multi-timeframe untuk strategi advanced, optimisasi untuk cari parameter terbaik (tapi hati-hati overfitting!), paper trading sebagai bridge antara backtest dan live trading.
+
+**Komponen Utama:**
+1. **Limit Order Simulation**:
+   - **Limit buy**: eksekusi jika harga turun ke/di bawah limit
+   - **Limit sell**: eksekusi jika harga naik ke/di atas limit
+   - **Fill logic**:
+     ```go
+     if bar.Low <= limitBuyPrice && bar.High >= limitBuyPrice {
+         // Assume fill di limit price (optimistic)
+         // Atau worst case: gunakan bar.Open (pessimistic)
+     }
+     ```
+   - **Partial fill**: split order jika volume tidak cukup
+
+2. **Multi-Timeframe Strategy**:
+   - Contoh: gunakan trend daily, eksekusi di 1h bar
+   ```go
+   type MultiTFStrategy struct {
+       dailyTrend  *indicators.SMA  // 200-day SMA di daily
+       hourlyEntry *indicators.RSI  // RSI di 1h
+   }
+   ```
+   - Challenge: sinkronisasi timestamp antar timeframe
+
+3. **Portfolio Backtesting**:
+   - Alokasi modal di BTC, ETH, SOL, dll
+   - Analisis korelasi: benefit diversifikasi
+   - Strategi rebalancing: equal-weight, risk-parity, dll
+
+4. **Optimisasi Parameter**:
+   
+   **a. Grid Search**
+   ```go
+   for fastPeriod := 5; fastPeriod <= 20; fastPeriod += 5 {
+       for slowPeriod := 30; slowPeriod <= 100; slowPeriod += 10 {
+           result := runBacktest(fastPeriod, slowPeriod)
+           // Track best Sharpe Ratio
+       }
+   }
+   ```
+   - Exhaustive, tapi lambat untuk parameter space besar
+   
+   **b. Genetic Algorithm**
+   - Evolve parameter set over generation
+   - Fitness function: Sharpe Ratio, profit factor, dll
+   - Lebih cepat dari grid search untuk dimensi tinggi
+
+5. **Live Trading Adapter (Paper Trading)**:
+   - Connect ke exchange WebSocket untuk data real-time
+   - Eksekusi sinyal strategi secara real-time (no money, mode simulasi)
+   - Log paper trade vs backtest actual
+   - Validasi final sebelum deploy real money
+
 ---
 
-## Strategy Development Workflow
+## Workflow Development Strategi
 
-1. **Hypothesis**: Define edge/alpha source
-2. **Indicator**: Implement required technical indicators
-3. **Strategy**: Code entry/exit logic
-4. **Backtest**: Run on historical data
-5. **Analyze**: Review metrics, equity curve, trade distribution
-6. **Iterate**: Refine parameters, risk management
-7. **Validate**: Walk-forward test on unseen data
-8. **Paper Trade**: Test in real-time (simulated)
-9. **Deploy**: Live trading with capital allocation
+1. **Hipotesis**: Define edge/alpha source
+2. **Indikator**: Implement indikator teknikal yang diperlukan
+3. **Strategi**: Code logika entry/exit
+4. **Backtest**: Run di data historical
+5. **Analisis**: Review metrik, equity curve, distribusi trade
+6. **Iterasi**: Refine parameter, risk management
+7. **Validasi**: Walk-forward test di unseen data
+8. **Paper Trade**: Test real-time (simulated)
+9. **Deploy**: Live trading dengan alokasi modal
 
 ---
 
-## Example Strategy
+## Contoh Strategi
 
 ```go
 // strategies/sma_crossover.go
@@ -169,12 +406,12 @@ func (s *SMACrossover) OnBar(bar data.OHLCV) strategy.Signal {
     fastVal := s.fast.Value()
     slowVal := s.slow.Value()
 
-    // Golden cross: fast MA crosses above slow MA
+    // Golden cross: fast MA cross di atas slow MA
     if fastVal > slowVal && s.fast.Prev() <= s.slow.Prev() {
         return strategy.SignalBuy
     }
 
-    // Death cross: fast MA crosses below slow MA
+    // Death cross: fast MA cross di bawah slow MA
     if fastVal < slowVal && s.fast.Prev() >= s.slow.Prev() {
         return strategy.SignalSell
     }
@@ -189,7 +426,7 @@ func (s *SMACrossover) Name() string {
 
 ---
 
-## Configuration Example
+## Contoh Konfigurasi
 
 ```yaml
 # config.yaml
@@ -209,7 +446,7 @@ strategy:
     slow_period: 30
 
 risk:
-  position_size: 0.95  # % of capital per trade
+  position_size: 0.95  # % modal per trade
   stop_loss: 0.02      # 2%
   take_profit: 0.05    # 5%
 
@@ -222,84 +459,137 @@ output:
   format: html  # html, json, csv
 ```
 
+**Note:** Config structure ini akan diimplementasikan menggunakan `viper` di fase awal development.
+
 ---
 
-## Key Decisions Log
+## Log Keputusan Kunci
 
-### 2026-08-29: Language Choice — Golang
+### 2026-08-29: Pilihan Bahasa — Golang
 **Rationale:**
-- Native concurrency for real-time data streams
-- Static typing reduces runtime errors
-- Fast compile times for rapid iteration
+- Concurrency native untuk real-time data stream
+- Static typing kurangi runtime error
+- Compile time cepat untuk iterasi rapid
 - Single binary deployment (no runtime dependencies)
-- Strong standard library
+- Standard library yang kuat
 
-### 2026-08-29: Storage Format — Parquet
+### 2026-08-29: Format Storage — Parquet
 **Rationale:**
-- Columnar format = efficient time-series queries
-- Compression (5-10x smaller than CSV)
+- Format columnar = query time-series efisien
+- Kompresi (5-10x lebih kecil dari CSV)
 - Schema enforcement
-- Wide ecosystem support (Python, R for analysis)
+- Ekosistem luas (Python, R untuk analisis)
+
+### 2026-08-29: Documentation-First Approach
+**Keputusan:** Tulis AGENT.md komprehensif sebelum coding
+**Rationale:**
+- Arsitektur jelas cegah scope creep
+- Iterasi di design lebih mudah dari di code
+- Jadi spec untuk implementasi
+- Future maintainer (termasuk future-you) paham "why"
 
 ---
 
-## Performance Targets
+## Target Performa (Aspirational)
 
-- **Backtest 1 year of 1h bars**: < 1 second
-- **Backtest 1 year of 1m bars**: < 10 seconds
-- **Parameter optimization (100 combinations)**: < 2 minutes
-- **Memory footprint**: < 500 MB for typical backtest
+*Target awal ini akan disesuaikan berdasarkan benchmark real-world.*
+
+- **Backtest 1 tahun 1h bar**: < 1-5 detik
+- **Backtest 1 tahun 1m bar**: < 10-30 detik
+- **Optimisasi parameter (100 kombinasi)**: < 2-10 menit
+- **Memory footprint**: < 500 MB untuk backtest typical
+
+**Environment benchmark:** Akan di-establish di Phase 1
 
 ---
 
-## Testing Strategy
+## Strategi Testing
 
-1. **Unit Tests**: Every indicator, strategy component
-2. **Integration Tests**: Full backtest runs with known outcomes
-3. **Property Tests**: Invariants (e.g., equity never negative without margin)
-4. **Regression Tests**: Lock in metrics for canonical strategies
-5. **Benchmarks**: Track performance regressions
+1. **Unit Test**: Setiap indikator, komponen strategi
+2. **Integration Test**: Full backtest run dengan known outcome
+3. **Property Test**: Invariant (e.g., equity never negative tanpa margin)
+4. **Regression Test**: Lock in metrik untuk canonical strategy
+5. **Benchmark**: Track performance regression
 
 ```bash
-make test          # Run all tests
-make test-unit     # Unit tests only
-make test-integration
-make bench         # Benchmarks
-make coverage      # Generate coverage report
+go test ./...              # Run semua test
+go test -v ./pkg/...       # Unit test saja
+go test -bench=.           # Benchmark
+go test -cover ./...       # Coverage report
 ```
 
 ---
 
-## Contributing Guidelines
+## Risiko & Mitigasi
 
-1. **Code Style**: Follow `gofmt`, use `golangci-lint`
-2. **Commits**: Conventional commits (feat, fix, docs, test, refactor)
-3. **PRs**: Include tests, update docs if API changes
-4. **Benchmarks**: Required for performance-critical code
+### 1. Look-Ahead Bias
+**Risiko:** Gunakan data masa depan di sinyal  
+**Mitigasi:** Arsitektur event-driven strict, tidak ada index peeking
+
+### 2. Survivorship Bias
+**Risiko:** Hanya test di coin yang masih listed  
+**Mitigasi:** Include delisted coin di dataset (jika tersedia)
+
+### 3. Overfitting
+**Risiko:** Strategi work di historical, fail di live  
+**Mitigasi:** Walk-forward validation, out-of-sample testing
+
+### 4. Kualitas Data
+**Risiko:** Missing bar, OHLCV incorrect  
+**Mitigasi:** Validation pipeline, multiple data source
+
+### 5. Slippage Underestimation
+**Risiko:** Eksekusi terlalu optimis  
+**Mitigasi:** Model slippage konservatif, test di market volatil
 
 ---
 
-## Resources
+## Guideline Contributing
 
-### Books
+1. **Code Style**: Follow `gofmt`, gunakan `golangci-lint`
+2. **Commit**: Conventional commit (feat, fix, docs, test, refactor)
+3. **PR**: Include test, update doc jika API berubah
+4. **Benchmark**: Required untuk performance-critical code
+
+---
+
+## Resource
+
+### Buku
 - *Advances in Financial Machine Learning* — Marcos López de Prado
 - *Algorithmic Trading* — Ernie Chan
 - *Quantitative Trading* — Ernie Chan
 
-### Papers
+### Paper
 - "The Deflated Sharpe Ratio" (Bailey & López de Prado)
 - "Backtesting" (Campbell Harvey)
 
-### Communities
+### Komunitas
 - QuantConnect Forum
 - /r/algotrading
 - Golang #trading Slack
+
+### Similar Project (Referensi)
+- **backtrader** (Python): mature, ecosystem luas
+- **VectorBT** (Python): cepat, vectorized
+- **Jesse** (Python): khusus crypto
+- **Comparison**: Kita build dari scratch untuk full control, zero bloat, dan Go performance
+
+---
+
+## Status Saat Ini
+
+**Phase:** 0 (Pre-development)  
+**Progress:** Struktur proyek established, arsitektur designed  
+**Next Milestone:** Phase 1 — Implementasi data pipeline  
+**Blocker:** Tidak ada  
+**Last Activity:** 2026-08-29
 
 ---
 
 ## License
 
-MIT (to be decided)
+Proprietrary (akan jadi MIT setelah stabilisasi)
 
 ---
 
