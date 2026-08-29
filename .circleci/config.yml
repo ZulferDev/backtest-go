@@ -13,6 +13,9 @@ jobs:
           name: Install golangci-lint
           command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
       - run:
+          name: Build all packages first
+          command: go build ./...
+      - run:
           name: Run golangci-lint
           command: $(go env GOPATH)/bin/golangci-lint run --timeout 5m ./...
 
@@ -30,7 +33,6 @@ jobs:
       - run:
           name: Check coverage threshold
           command: |
-            # Placeholder validation for minimum coverage
             go tool cover -func=coverage.out
 
   benchmark:
