@@ -26,8 +26,10 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 ### 5. CI/CD with CircleCI (STRICT RULE)
 - **STRICT:** DILARANG RUNNING TEST LOKAL. Setiap perubahan WAJIB di-commit & push ke GitHub.
 - Biarkan CircleCI yang melakukan test, linting, dan benchmarking.
-- AI mengecek status CircleCI via CLI (`circleci run get <ID> --failure-report`).
+- AI mengecek status CircleCI via CLI (`gh run list`, `gh run view`).
 - Every PR/Commit must pass all CircleCI checks.
+- **WAJIB:** Setiap selesai sub-phase, COMMIT & PUSH ke GitHub untuk trigger CircleCI.
+- **LAPORAN:** Completion report dibuat per PHASE (bukan per sub-phase) setelah semua sub-phase selesai.
 
 ---
 
@@ -79,9 +81,9 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 **Objective: Sediakan 'Lego Blocks' agar AI bisa merakit strategi kompleks**
 
 #### Sub-phase 2.1: Technical Indicators Library
-- [ ] Math primitives (SMA, EMA, RSI, MACD, ATR, Bollinger)
-- [ ] Custom window functions (Rolling min/max, standard deviation)
-- [ ] Caching mekanisme indikator agar kalkulasi efisien
+- [x] Math primitives (SMA, EMA, RSI, MACD, ATR, Bollinger)
+- [ ] Custom window functions (Rolling min/max, standard deviation) — deferred to Phase 2.2
+- [ ] Caching mekanisme indikator agar kalkulasi efisien — deferred to Phase 4 (optimization)
 
 #### Sub-phase 2.2: Signal & Risk Management Primitives
 - [ ] Position Sizing primitives (Fixed fractional, Kelly criterion)
