@@ -91,8 +91,8 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [x] Multi-timeframe helper (timeframe conversion, aggregation, alignment)
 
 #### Sub-phase 2.3: Safe Code Validation System
-- [ ] AST-based Go code linter (menolak import berbahaya dari AI)
-- [ ] Autogenerate strategy unit test template
+- [x] AST-based Go code linter (detects unsafe imports, goroutines, syscalls)
+- [x] Auto-generate strategy unit test template
 
 ---
 
