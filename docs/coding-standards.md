@@ -1,33 +1,37 @@
 # Coding Standards & Testing Guidelines
 
-## 1. Go Style Guide
+## 1. Go Style Guide (Core Framework)
 
 - Ikuti standard `gofmt` dan `goimports`.
 - Gunakan `golangci-lint` sebagai static analysis checker.
 - Hindari penggunaan global state atau package-level mutable variables.
-- Gunakan `context.Context` untuk timeout/cancellation pada I/O (fetching data).
+- Performa sangat kritikal di core engine: hindari alokasi heap di dalam hot path (event loop `OnBar`). Gunakan pre-allocated slice atau object pooling.
 
-## 2. Error Handling
+## 2. Standards untuk "AI-Generated Strategy Code"
 
-- Gunakan errors wrap jika membutuhkan konteks tambahan: `fmt.Errorf("context: %w", err)`.
-- Sentinel error harus diexpose di tingkat package jika client perlu membandingkan tipe error.
-- Hindari `panic` pada execution path. Gunakan panic hanya pada inisialisasi kritis yang fatal.
-- Nil value check wajib dilakukan sebelum mengakses pointer dereference.
+AI diperlakukan sebagai kontributor kode. Namun, kode AI memiliki aturan khusus (Sandboxing):
+
+### Aturan Larangan (Strict Boundaries)
+- **No I/O:** AI dilarang import package `os`, `io`, `net/http`, `fmt` (kecuali untuk implementasi log yang diizinkan framework).
+- **No Concurrency:** Dilarang menggunakan `go func()`, `sync.Mutex`, atau channel di dalam struct strategi. Strategi harus 100% deterministik dan sinkron (single-threaded state execution).
+- **No External State:** Strategi tidak boleh membaca file eksternal atau variabel lingkungan (`os.Getenv`). Segala informasi market harus bersumber dari `sdk.BarContext`.
+- **Error Panic Prevention:** Hindari inisialisasi slice atau map tanpa batasan ukuran yang menyebabkan Out-Of-Memory. Lakukan nil/bound check manual jika membuat array custom.
+
+### Aturan SDK
+- Harus mengimplementasikan interface `strategy.Strategy` dengan benar.
+- Eksekusi order harus selalu melalui fungsi SDK yang disediakan (misal: `ctx.MarketBuy()`). AI dilarang mencoba membuat state posisi secara independen untuk bypass balance check.
 
 ## 3. Testing Requirements
 
-- **Target Coverage:** Minimal 80% coverage pada core engine dan pipeline logic.
-- **Table-Driven Tests:** Gunakan pattern ini untuk fungsi utilitas dan indikator matematika.
-- **Mocking:** Interface-driven mocking untuk testing engine tanpa menyentuh network exchange.
-- **Race Detector:** Gunakan flag `-race` pada testing untuk mendeteksi race conditions di runtime concurrent.
+- **Target Coverage (Core):** Minimal 80% coverage pada core engine dan SDK pipeline.
+- **Auto-Test (AI Strategy):** Setiap file `.go` hasil generasi AI wajib dibuatkan *harness test* (unit test kecil) oleh sistem yang mencekok data dummy kosong (`OHLCV{}`) dan ekstrem, guna memastikan logika `OnBar` AI tidak *panic* (misal karena divide-by-zero).
+- **Race Detector:** Gunakan flag `-race` pada testing untuk core runtime concurrent.
 
 ```bash
 # Standard testing execution
 go test -v -race -coverprofile=coverage.out ./...
 ```
 
-## 4. Documentation
+## 4. Linter & Validator Khusus
 
-- Setiap fungsi publik wajib memiliki deskripsi singkat.
-- Parameter masukan dan nilai kembalian harus didokumentasikan di header fungsi.
-- Contoh implementasi strategi diletakkan di subfolder `/strategies` dengan README terpisah.
+- Proyek ini akan menggunakan parser AST kustom (via package `go/ast`) untuk menyeleksi dan mereject source code buatan AI jika melanggar batasan import di atas.
