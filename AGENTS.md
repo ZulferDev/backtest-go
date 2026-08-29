@@ -23,6 +23,12 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - Core backtest engine murni berjalan di Go tanpa intervensi AI selama kalkulasi.
 - Eksekusi order, slippage, dan PnL adalah kebenaran mutlak (Source of Truth).
 
+### 5. CI/CD with CircleCI (STRICT RULE)
+- **STRICT:** DILARANG RUNNING TEST LOKAL. Setiap perubahan WAJIB di-commit & push ke GitHub.
+- Biarkan CircleCI yang melakukan test, linting, dan benchmarking.
+- AI mengecek status CircleCI via CLI (`circleci run get <ID> --failure-report`).
+- Every PR/Commit must pass all CircleCI checks.
+
 ---
 
 ## Development Phases
