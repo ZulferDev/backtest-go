@@ -86,9 +86,9 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [ ] Caching mekanisme indikator agar kalkulasi efisien — deferred to Phase 4 (optimization)
 
 #### Sub-phase 2.2: Signal & Risk Management Primitives
-- [ ] Position Sizing primitives (Fixed fractional, Kelly criterion)
-- [ ] Stop Loss & Trailing Stop helpers
-- [ ] Multi-timeframe helper (e.g., baca trend 1D di eksekusi 1h)
+- [x] Position Sizing primitives (Fixed fractional, Kelly criterion)
+- [x] Stop Loss & Trailing Stop helpers (Fixed, Percent, ATR-based, Trailing)
+- [x] Multi-timeframe helper (timeframe conversion, aggregation, alignment)
 
 #### Sub-phase 2.3: Safe Code Validation System
 - [ ] AST-based Go code linter (menolak import berbahaya dari AI)
