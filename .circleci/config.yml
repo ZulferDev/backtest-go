@@ -7,13 +7,18 @@ jobs:
   lint:
     docker:
       - image: cimg/go:1.21
+    environment:
+      GO111MODULE: "on"
     steps:
       - checkout
       - run:
           name: Install golangci-lint
           command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
       - run:
-          name: Build all packages first
+          name: Download dependencies
+          command: go mod download
+      - run:
+          name: Build all packages
           command: go build ./...
       - run:
           name: Run golangci-lint
@@ -22,6 +27,8 @@ jobs:
   test:
     docker:
       - image: cimg/go:1.21
+    environment:
+      GO111MODULE: "on"
     steps:
       - checkout
       - go/load-cache
@@ -38,6 +45,8 @@ jobs:
   benchmark:
     docker:
       - image: cimg/go:1.21
+    environment:
+      GO111MODULE: "on"
     steps:
       - checkout
       - run:
