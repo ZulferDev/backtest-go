@@ -8,7 +8,10 @@ jobs:
       - checkout
       - run:
           name: Install golangci-lint
-          command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+          command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.60.3
+      - run:
+          name: Build all packages
+          command: go build ./...
       - run:
           name: Run golangci-lint
           command: $(go env GOPATH)/bin/golangci-lint run --timeout 5m ./...
