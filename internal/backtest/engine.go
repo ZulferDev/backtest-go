@@ -126,3 +126,16 @@ func (e *Engine) Run() error {
 func (e *Engine) GetState() *State {
 	return e.state
 }
+
+// Accessor methods for State (for report generation)
+func (s *State) Trades() []Trade {
+	return s.trades
+}
+
+func (s *State) InitialCash() float64 {
+	return s.initialCash
+}
+
+func (s *State) Equity() float64 {
+	return s.equity
+}
