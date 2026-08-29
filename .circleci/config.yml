@@ -7,14 +7,12 @@ jobs:
   lint:
     docker:
       - image: cimg/go:1.21
-    working_directory: ~/project
+    working_directory: ~/project/backtest-go
     environment:
       GO111MODULE: "on"
     steps:
-      - checkout
-      - run:
-          name: Check Go environment
-          command: go env && pwd && ls -la
+      - checkout: 
+          path: ~/project
       - run:
           name: Install golangci-lint
           command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
@@ -31,11 +29,12 @@ jobs:
   test:
     docker:
       - image: cimg/go:1.21
-    working_directory: ~/project
+    working_directory: ~/project/backtest-go
     environment:
       GO111MODULE: "on"
     steps:
-      - checkout
+      - checkout:
+          path: ~/project
       - go/load-cache
       - go/mod-download
       - go/save-cache
@@ -50,11 +49,12 @@ jobs:
   benchmark:
     docker:
       - image: cimg/go:1.21
-    working_directory: ~/project
+    working_directory: ~/project/backtest-go
     environment:
       GO111MODULE: "on"
     steps:
-      - checkout
+      - checkout:
+          path: ~/project
       - run:
           name: Run benchmarks
           command: go test -run=^$ -bench=. -benchmem ./...
