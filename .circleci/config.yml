@@ -1,0 +1,54 @@
+version: 2.1
+
+orbs:
+  go: circleci/go@1.9.0
+
+jobs:
+  lint:
+    docker:
+      - image: cimg/go:1.21
+    steps:
+      - checkout
+      - run:
+          name: Install golangci-lint
+          command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+      - run:
+          name: Run golangci-lint
+          command: $(go env GOPATH)/bin/golangci-lint run --timeout 5m ./...
+
+  test:
+    docker:
+      - image: cimg/go:1.21
+    steps:
+      - checkout
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
+      - run:
+          name: Run tests with coverage and race detector
+          command: go test -v -race -coverprofile=coverage.out ./...
+      - run:
+          name: Check coverage threshold
+          command: |
+            # Placeholder validation for minimum coverage
+            go tool cover -func=coverage.out
+
+  benchmark:
+    docker:
+      - image: cimg/go:1.21
+    steps:
+      - checkout
+      - run:
+          name: Run benchmarks
+          command: go test -run=^$ -bench=. -benchmem ./...
+
+workflows:
+  build-test:
+    jobs:
+      - lint
+      - test:
+          requires:
+            - lint
+      - benchmark:
+          requires:
+            - test
