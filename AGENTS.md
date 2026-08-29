@@ -58,18 +58,20 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 **Objective: Accurate, reliable backtest foundation**
 
 #### Sub-phase 1.1: Data Pipeline
-- [ ] Binance/Bybit historical fetcher
-- [ ] Data normalizer & local parquet storage
-- [ ] Ingestion validator integration
+- [x] Binance/Bybit historical fetcher
+- [x] Data normalizer & local JSON storage
+- [x] Ingestion validator integration
 
 #### Sub-phase 1.2: Backtest Core & SDK Context
-- [ ] Event-driven Engine (`OnBar`, `OnTick`)
-- [ ] **Strategy Context SDK** (Sandboxed API: `ctx.Buy()`, `ctx.CloseAll()`)
-- [ ] Execution Simulator (Fees, Slippage, Fills)
+- [x] Event-driven Engine (`OnBar`, `OnTick`)
+- [x] **Strategy Context SDK** (Sandboxed API: `ctx.Buy()`, `ctx.CloseAll()`)
+- [x] Execution Simulator (basic implementation)
+- [ ] Advanced Fees & Slippage models (deferred to optimization phase)
 
 #### Sub-phase 1.3: Metrics & Reporting
-- [ ] PnL, Sharpe, Max Drawdown, Sortino
-- [ ] JSON trade log & HTML Report builder
+- [x] PnL, Sharpe, Max Drawdown, Sortino
+- [x] JSON trade log & metrics report
+- [ ] HTML Report builder (deferred to Phase 4)
 
 ---
 
