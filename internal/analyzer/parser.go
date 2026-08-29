@@ -73,8 +73,8 @@ func ParseResultsString(jsonData string) (*BacktestResult, error) {
 func (r *BacktestResult) ToMarkdown() string {
 	md := "# Backtest Results Analysis\n\n"
 	md += "## Performance Summary\n\n"
-	md += fmt.Sprintf("| Metric | Value |\n")
-	md += fmt.Sprintf("|--------|-------|\n")
+	md += "| Metric | Value |\n"
+	md += "|--------|-------|\n"
 	md += fmt.Sprintf("| Total Trades | %d |\n", r.Summary.TotalTrades)
 	md += fmt.Sprintf("| Win Rate | %.2f%% |\n", r.Summary.WinRate)
 	md += fmt.Sprintf("| Total PnL | $%.2f |\n", r.Summary.TotalPnL)
@@ -107,7 +107,7 @@ func (r *BacktestResult) ToMarkdown() string {
 	if len(r.Equity.Equity) > 0 {
 		initialEquity := r.Equity.Equity[0]
 		finalEquity := r.Equity.Equity[len(r.Equity.Equity)-1]
-		md += fmt.Sprintf("\n## Equity Curve\n\n")
+		md += "\n## Equity Curve\n\n"
 		md += fmt.Sprintf("- Starting Equity: $%.2f\n", initialEquity)
 		md += fmt.Sprintf("- Ending Equity: $%.2f\n", finalEquity)
 		md += fmt.Sprintf("- Data Points: %d\n", len(r.Equity.Equity))
