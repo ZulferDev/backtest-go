@@ -23,7 +23,9 @@ func (p *Pipeline) Validate(code, filename string) ([]validator.ValidationError,
 
 func (p *Pipeline) SaveCode(code, filename string) (string, error) {
 	dir := filepath.Join(p.WorkDir, "strategies")
-	os.MkdirAll(dir, 0755)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", fmt.Errorf("failed to create directory: %w", err)
+	}
 	path := filepath.Join(dir, filename)
 	err := os.WriteFile(path, []byte(code), 0644)
 	return path, err
