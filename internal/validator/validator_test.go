@@ -56,33 +56,36 @@ func TestValidator_Goroutines(t *testing.T) {
 	code := `package main
 
 func main() {
-	go func() {}
+	go func() {}()
 }
 `
 
 	v := NewValidator()
 	err := v.ValidateFile("test.go", []byte(code))
-	if err == nil {
-		t.Error("Expected error for goroutine usage")
-		return
-	}
-
+	
+	// Should have validation errors
 	errors := v.GetErrors()
+	t.Logf("ValidateFile returned err: %v, errors count: %d", err, len(errors))
+	
+	if err == nil {
+		t.Error("Expected validation error")
+	}
+	
 	if len(errors) == 0 {
-		t.Error("Expected validation errors")
-		return
+		t.Fatal("Expected at least one validation error")
 	}
 
 	// Check if any error mentions goroutines
 	found := false
 	for _, e := range errors {
+		t.Logf("Error: %s (rule: %s)", e.Message, e.Rule)
 		if strings.Contains(e.Message, "goroutine") {
 			found = true
-			break
 		}
 	}
+	
 	if !found {
-		t.Errorf("Expected goroutine error, got: %v", errors)
+		t.Errorf("No goroutine error found. Errors: %+v", errors)
 	}
 }
 
