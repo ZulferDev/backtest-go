@@ -100,9 +100,9 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 **Objective: Hubungkan AI sebagai programmer & data scientist otonom**
 
 #### Sub-phase 3.1: Code Generation Pipeline
-- [ ] System prompt untuk AI code generator
-- [ ] Pipeline: AI tulis `.go` -> CLI baca -> Lint AST -> Test -> Backtest
-- [ ] Error feedback loop (Jika compile gagal, kirim error ke AI untuk di-fix)
+- [x] System prompt untuk AI code generator
+- [x] Pipeline: AI tulis `.go` -> CLI baca -> Lint AST -> Test -> Backtest
+- [x] Error feedback loop (compile errors, validation errors)
 
 #### Sub-phase 3.2: Analytical Feedback Loop
 - [ ] Parser `results.json` ke format ringkas untuk prompt AI
