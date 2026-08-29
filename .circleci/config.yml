@@ -7,11 +7,17 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Clean modcache
+          command: go clean -modcache
+      - run:
+          name: Check Go env
+          command: go env && pwd && ls -la && cat go.mod
+      - run:
           name: Install golangci-lint
           command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.60.3
       - run:
           name: Build all packages
-          command: go build ./...
+          command: go build -v ./...
       - run:
           name: Run golangci-lint
           command: $(go env GOPATH)/bin/golangci-lint run --timeout 5m ./...
@@ -21,16 +27,9 @@ jobs:
       - image: cimg/go:1.21
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - go-mod-v4-{{ checksum "go.mod" }}
       - run:
-          name: Download Dependencies
-          command: go mod download
-      - save_cache:
-          key: go-mod-v4-{{ checksum "go.mod" }}
-          paths:
-            - "/home/circleci/go/pkg/mod"
+          name: Clean modcache
+          command: go clean -modcache
       - run:
           name: Run tests with coverage and race detector
           command: go test -v -race -coverprofile=coverage.out ./...
