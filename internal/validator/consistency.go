@@ -2,7 +2,7 @@ package validator
 
 import (
 	"math"
-	"backtest-go/pkg/data"
+	"github.com/ZulferDev/backtest-go/pkg/data"
 )
 
 // DetectOutliers checks for sudden abnormal price movement (e.g. > threshold % in 1 bar)

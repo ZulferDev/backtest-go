@@ -3,7 +3,7 @@ package validator
 import (
 	"errors"
 	"fmt"
-	"backtest-go/pkg/data"
+	"github.com/ZulferDev/backtest-go/pkg/data"
 )
 
 var (
