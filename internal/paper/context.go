@@ -18,6 +18,14 @@ type paperBarContext struct {
 }
 
 // Market order methods
+func (c *paperBarContext) MarketBuy(quantity float64) error {
+	return c.MarketOrder("long", quantity)
+}
+
+func (c *paperBarContext) MarketSell(quantity float64) error {
+	return c.MarketOrder("short", quantity)
+}
+
 func (c *paperBarContext) MarketOrder(side string, size float64) error {
 	c.executor.mu.Lock()
 	defer c.executor.mu.Unlock()
@@ -71,16 +79,32 @@ func (c *paperBarContext) CloseAll() error {
 }
 
 // Position query methods
-func (c *paperBarContext) HasPosition() bool {
+func (c *paperBarContext) HasOpenPosition() bool {
 	c.executor.mu.RLock()
 	defer c.executor.mu.RUnlock()
 	return c.executor.state.Position != nil
 }
 
+func (c *paperBarContext) HasPosition() bool {
+	return c.HasOpenPosition()
+}
+
+func (c *paperBarContext) CurrentPosition() sdk.Position {
+	c.executor.mu.RLock()
+	defer c.executor.mu.RUnlock()
+
+	if c.executor.state.Position == nil {
+		return nil
+	}
+
+	// Return a wrapper that implements sdk.Position interface
+	return &paperPosition{pos: c.executor.state.Position}
+}
+
 func (c *paperBarContext) PositionSize() float64 {
 	c.executor.mu.RLock()
 	defer c.executor.mu.RUnlock()
-	
+
 	if c.executor.state.Position == nil {
 		return 0
 	}
@@ -90,7 +114,7 @@ func (c *paperBarContext) PositionSize() float64 {
 func (c *paperBarContext) PositionSide() string {
 	c.executor.mu.RLock()
 	defer c.executor.mu.RUnlock()
-	
+
 	if c.executor.state.Position == nil {
 		return ""
 	}
@@ -118,4 +142,33 @@ func (c *paperBarContext) History(lookback int) []sdk.OHLCV {
 // Log prints a message (paper trading version)
 func (c *paperBarContext) Log(msg string) {
 	// Logging implementation
+}
+
+// LogCustomMetric logs a custom metric (paper trading version)
+func (c *paperBarContext) LogCustomMetric(key string, value float64) {
+	// Custom metric logging implementation
+}
+
+// paperPosition wraps the internal Position to implement sdk.Position
+type paperPosition struct {
+	pos *Position
+}
+
+func (p *paperPosition) Size() float64 {
+	return p.pos.Size
+}
+
+func (p *paperPosition) EntryPrice() float64 {
+	return p.pos.EntryPrice
+}
+
+func (p *paperPosition) UnrealizedPnL(currentPrice float64) float64 {
+	if p.pos.Side == "long" {
+		return (currentPrice - p.pos.EntryPrice) * p.pos.Size
+	}
+	return (p.pos.EntryPrice - currentPrice) * p.pos.Size
+}
+
+func (p *paperPosition) Side() string {
+	return p.pos.Side
 }

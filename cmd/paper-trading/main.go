@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ZulferDev/backtest-go/internal/paper"
+	"github.com/ZulferDev/backtest-go/pkg/sdk"
 )
 
 func main() {
@@ -150,12 +151,12 @@ func printSummary(state *paper.TradingState) {
 // MonitorStrategy is a simple example strategy for monitoring
 type MonitorStrategy struct{}
 
-func (s *MonitorStrategy) Init(ctx paper.InitContext) error {
+func (s *MonitorStrategy) Init(ctx sdk.InitContext) error {
 	log.Println("Strategy initialized")
 	return nil
 }
 
-func (s *MonitorStrategy) OnBar(ctx paper.BarContext, bar paper.OHLCV) error {
+func (s *MonitorStrategy) OnBar(ctx sdk.BarContext, bar sdk.OHLCV) error {
 	// This is a passive monitoring strategy - no trades
 	// Replace with actual strategy logic for active trading
 	return nil
