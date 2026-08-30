@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ZulferDev/backtest-go/pkg/data"
+	"github.com/ZulferDev/backtest-go/pkg/sdk"
 )
 
 func TestGridSearchGeneration(t *testing.T) {
@@ -192,11 +193,11 @@ func TestParallelExecutorStatus(t *testing.T) {
 // Mock strategy for testing
 type mockStrategy struct{}
 
-func (m *mockStrategy) Init(ctx interface{}) error {
+func (m *mockStrategy) Init(ctx sdk.InitContext) error {
 	return nil
 }
 
-func (m *mockStrategy) OnBar(ctx interface{}, bar data.OHLCV) error {
+func (m *mockStrategy) OnBar(ctx sdk.BarContext, bar sdk.OHLCV) error {
 	return nil
 }
 

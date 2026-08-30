@@ -111,10 +111,10 @@ func (p *ParallelExecutor) executeBacktest(task BacktestTask) BacktestResult {
 	}
 
 	// Create backtest engine
-	engine := backtest.NewEngine(task.Config.Strategy, task.InitialCap)
+	engine := backtest.NewEngine(task.Config.Strategy, task.Data, task.InitialCap)
 
 	// Run backtest
-	if err := engine.Run(task.Data); err != nil {
+	if err := engine.Run(); err != nil {
 		result.Error = fmt.Errorf("backtest execution failed: %w", err)
 		result.Duration = time.Since(startTime)
 		return result
@@ -125,16 +125,17 @@ func (p *ParallelExecutor) executeBacktest(task BacktestTask) BacktestResult {
 	
 	// Calculate total return
 	if task.InitialCap > 0 {
-		result.TotalReturn = ((state.Equity - task.InitialCap) / task.InitialCap) * 100
+		result.TotalReturn = ((state.Equity() - task.InitialCap) / task.InitialCap) * 100
 	}
 
 	// Calculate win rate
-	if len(state.Trades) > 0 {
+	trades := state.Trades()
+	if len(trades) > 0 {
 		winningTrades := 0
 		totalProfit := 0.0
 		totalLoss := 0.0
 
-		for _, trade := range state.Trades {
+		for _, trade := range trades {
 			if trade.PnL > 0 {
 				winningTrades++
 				totalProfit += trade.PnL
@@ -143,8 +144,8 @@ func (p *ParallelExecutor) executeBacktest(task BacktestTask) BacktestResult {
 			}
 		}
 
-		result.WinRate = (float64(winningTrades) / float64(len(state.Trades))) * 100
-		result.TotalTrades = len(state.Trades)
+		result.WinRate = (float64(winningTrades) / float64(len(trades))) * 100
+		result.TotalTrades = len(trades)
 
 		// Calculate profit factor
 		if totalLoss > 0 {
