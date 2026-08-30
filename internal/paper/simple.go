@@ -43,37 +43,49 @@ func (e *SimpleExecutor) PlaceMarketOrder(side string, size float64, price float
 		return sdk.ErrInvalidQuantity
 	}
 
-	// If we have a position, close it first
+	// If we have a position, check if this order closes it
 	if e.position != nil {
-		// Calculate PnL
-		var pnl float64
-		if e.position.Side == "long" {
-			pnl = (price - e.position.EntryPrice) * e.position.Size
-		} else {
-			pnl = (e.position.EntryPrice - price) * e.position.Size
+		shouldClose := false
+		if e.position.Side == "long" && (side == "sell" || side == "short") {
+			shouldClose = true
+		} else if e.position.Side == "short" && (side == "buy" || side == "long") {
+			shouldClose = true
 		}
 
-		// Simple fee: 0.1% per side
-		fee := (e.position.EntryPrice + price) * e.position.Size * 0.001
-		pnl -= fee
+		if shouldClose {
+			// Calculate PnL
+			var pnl float64
+			if e.position.Side == "long" {
+				pnl = (price - e.position.EntryPrice) * e.position.Size
+			} else {
+				pnl = (e.position.EntryPrice - price) * e.position.Size
+			}
 
-		trade := Trade{
-			Side:       e.position.Side,
-			EntryPrice: e.position.EntryPrice,
-			ExitPrice:  price,
-			Size:       e.position.Size,
-			EntryTime:  e.position.EntryTime,
-			ExitTime:   0, // Current time
-			PnL:        pnl,
-			Fee:        fee,
+			// Simple fee: 0.1% per side
+			fee := (e.position.EntryPrice + price) * e.position.Size * 0.001
+			pnl -= fee
+
+			trade := Trade{
+				Side:       e.position.Side,
+				EntryPrice: e.position.EntryPrice,
+				ExitPrice:  price,
+				Size:       e.position.Size,
+				EntryTime:  e.position.EntryTime,
+				ExitTime:   0, // Current time
+				PnL:        pnl,
+				Fee:        fee,
+			}
+
+			e.trades = append(e.trades, trade)
+			e.equity += pnl
+			e.position = nil
+			
+			// Position closed, don't open new one
+			return nil
 		}
-
-		e.trades = append(e.trades, trade)
-		e.equity += pnl
-		e.position = nil
 	}
 
-	// Open new position if buy or long
+	// Open new position if no existing position
 	if side == "buy" || side == "long" {
 		e.position = &Position{
 			Side:       "long",

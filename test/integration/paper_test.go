@@ -54,7 +54,9 @@ func TestPaperTradingExecution(t *testing.T) {
 	}
 
 	// Verify PnL (bought at 50000, sold at 51000, size=1.0)
-	expectedEquity := 10000.0 + (51000.0-50000.0)*1.0
+	// Gross PnL = 1000, Fee = (50000 + 51000) * 1.0 * 0.001 = 101
+	// Net PnL = 1000 - 101 = 899
+	expectedEquity := 10000.0 + 899.0
 	if executor.GetEquity() != expectedEquity {
 		t.Errorf("Expected equity %.2f, got %.2f", expectedEquity, executor.GetEquity())
 	}

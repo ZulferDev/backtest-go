@@ -7,37 +7,37 @@ import (
 
 func TestValidator_UnsafeImports(t *testing.T) {
 	tests := []struct {
-		name    string
-		code    string
-		wantErr bool
+		name        string
+		code        string
+		wantErrors  bool
 	}{
 		{
 			name: "safe imports",
 			code: `package main
 import "fmt"
 func main() {}`,
-			wantErr: false,
+			wantErrors: false,
 		},
 		{
 			name: "unsafe os import",
 			code: `package main
 import "os"
 func main() {}`,
-			wantErr: true,
+			wantErrors: true,
 		},
 		{
 			name: "unsafe net import",
 			code: `package main
 import "net"
 func main() {}`,
-			wantErr: true,
+			wantErrors: true,
 		},
 		{
 			name: "unsafe syscall import",
 			code: `package main
 import "syscall"
 func main() {}`,
-			wantErr: true,
+			wantErrors: true,
 		},
 	}
 
@@ -45,8 +45,13 @@ func main() {}`,
 		t.Run(tt.name, func(t *testing.T) {
 			v := NewValidator()
 			err := v.ValidateFile("test.go", []byte(tt.code))
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateFile() error = %v, wantErr %v", err, tt.wantErr)
+			if err != nil {
+				t.Fatalf("ValidateFile() unexpected error: %v", err)
+			}
+			
+			hasErrors := len(v.GetErrors()) > 0
+			if hasErrors != tt.wantErrors {
+				t.Errorf("Expected validation errors=%v, got errors=%v (%v)", tt.wantErrors, hasErrors, v.GetErrors())
 			}
 		})
 	}
@@ -63,13 +68,13 @@ func main() {
 	v := NewValidator()
 	err := v.ValidateFile("test.go", []byte(code))
 	
+	if err != nil {
+		t.Fatalf("ValidateFile() unexpected error: %v", err)
+	}
+	
 	// Should have validation errors
 	errors := v.GetErrors()
 	t.Logf("ValidateFile returned err: %v, errors count: %d", err, len(errors))
-	
-	if err == nil {
-		t.Error("Expected validation error")
-	}
 	
 	if len(errors) == 0 {
 		t.Fatal("Expected at least one validation error")

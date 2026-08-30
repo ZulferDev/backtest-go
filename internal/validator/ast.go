@@ -49,10 +49,8 @@ func (v *Validator) ValidateFile(filename string, src []byte) error {
 	v.checkSyscalls(file)
 	v.checkUnsafeFunctions(file)
 
-	if len(v.errors) > 0 {
-		return fmt.Errorf("%d validation errors found", len(v.errors))
-	}
-
+	// Don't return error for validation errors - caller should check GetErrors()
+	// Only return error for parse errors or unexpected failures
 	return nil
 }
 
