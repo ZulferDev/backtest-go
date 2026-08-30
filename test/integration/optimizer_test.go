@@ -59,15 +59,13 @@ func TestParallelOptimizer(t *testing.T) {
 	resultsChan := executor.GetResults()
 
 	for i := 0; i < len(combinations); i++ {
-		select {
-		case result := <-resultsChan:
-			if result.Error != nil {
-				t.Logf("Task %s failed: %v", result.TaskID, result.Error)
-			} else {
-				results = append(results, result)
-				t.Logf("Task %s completed: Return=%.2f%%, Sharpe=%.2f",
-					result.TaskID, result.TotalReturn*100, result.SharpeRatio)
-			}
+		result := <-resultsChan
+		if result.Error != nil {
+			t.Logf("Task %s failed: %v", result.TaskID, result.Error)
+		} else {
+			results = append(results, result)
+			t.Logf("Task %s completed: Return=%.2f%%, Sharpe=%.2f",
+				result.TaskID, result.TotalReturn*100, result.SharpeRatio)
 		}
 	}
 
@@ -114,7 +112,7 @@ func TestParallelExecutorConcurrency(t *testing.T) {
 			Data:       testData,
 			InitialCap: 10000.0,
 		}
-		executor.Submit(task)
+		_ = executor.Submit(task)
 	}
 
 	// Collect results

@@ -28,7 +28,8 @@ func (p *ResultParser) ParseBacktestResult(result map[string]interface{}) *Summa
 	if v, ok := result["num_trades"].(int); ok {
 		summary.TotalTrades = v
 	}
-	if _, ok := result["final_equity"].(float64); ok {
+	if v, ok := result["final_equity"].(float64); ok {
+		_ = v // Use final_equity if needed in future calculations
 		// Calculate win rate if we have trades data
 	}
 	if v, ok := result["profit_factor"].(float64); ok {
