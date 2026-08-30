@@ -3,60 +3,19 @@
 *.o
 *.obj
 *.out
-
-# Dependencies
-vendor/
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Editors
-.vscode/
-.idea/
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Environment
-.env
-.env.local
-.env.*
-
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
+*.a
 *.so
-*.egg-info/
-.eggs/
-
-# Go specific
-*.exe
 *.dll
-*.so
-*.dylib
-*.test
-*.prof
-cover.out
-
-# Build directories
-dist/
-build/
-target/
-bin/
-out/
-
-# Compression
+*.exe
+*.pyc
+*.class
+*.jar
+*.war
 *.zip
+*.tar.gz
+*.tar.xz
+*.tar.bz2
 *.gz
-*.tar
-*.tgz
 *.bz2
 *.xz
 *.7z
@@ -71,20 +30,65 @@ out/
 *.Z
 *.lz
 *.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
 
-# System files
-.DS_Store
-Thumbs.db
-
-# Cache
-.cache/
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
 .mypy_cache/
 .pytest_cache/
+target/
 .gradle/
-.npm/
-.yarn/
+build/
+dist/
+out/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.~
+*~
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System
+.DS_Store
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Icon?
+iTunes_Control/
+*.DS_Store
+*.tmp
+*~
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Go specific
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.prof
+cover.out
 ```
