@@ -219,6 +219,8 @@ func (wsc *WebSocketClient) Close() error {
 // parseFloat safely parses string to float64
 func parseFloat(s string) float64 {
 	var f float64
-	json.Unmarshal([]byte(s), &f)
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		log.Printf("Failed to parse float: %v", err)
+	}
 	return f
 }
