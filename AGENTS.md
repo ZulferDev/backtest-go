@@ -110,8 +110,8 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [x] Parser `results.json` ke format ringkas untuk prompt AI
 - [x] Framework evaluasi hipotesa (bandingkan ekspektasi vs realita backtest)
 - [x] Memory state untuk menyimpan "insight riset"
-- [ ] **Research Memory Database** - SQLite persistent storage for learning
-- [ ] **Structured Feedback Format** - JSON schema for AI consumption
+- [x] **Research Memory Database** - SQLite persistent storage for learning
+- [x] **Structured Feedback Format** - JSON schema for AI consumption
 
 #### Sub-phase 3.3: Overfitting Prevention
 - [x] Walk-forward test orchestrator
