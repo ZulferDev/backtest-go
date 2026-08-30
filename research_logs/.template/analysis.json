@@ -1,0 +1,76 @@
+{
+  "strategy_id": "example_strategy",
+  "version": "v1",
+  "backtest_results": {
+    "total_return": 0.234,
+    "sharpe_ratio": 1.82,
+    "sortino_ratio": 2.15,
+    "max_drawdown": 0.12,
+    "win_rate": 0.52,
+    "total_trades": 145,
+    "winning_trades": 75,
+    "losing_trades": 70,
+    "avg_win": 0.025,
+    "avg_loss": -0.018,
+    "profit_factor": 1.45
+  },
+  "hypothesis_validation": {
+    "thesis_confirmed": true,
+    "success_criteria_met": {
+      "sharpe_ratio": {
+        "target": 1.5,
+        "actual": 1.82,
+        "met": true
+      },
+      "max_drawdown": {
+        "target": 0.15,
+        "actual": 0.12,
+        "met": true
+      },
+      "win_rate": {
+        "target": 0.45,
+        "actual": 0.52,
+        "met": true
+      }
+    },
+    "evidence": [
+      "Sharpe > 1.5 achieved (1.82)",
+      "Drawdown within limit (12% < 15%)",
+      "Win rate above target (52% > 45%)"
+    ]
+  },
+  "identified_weaknesses": [
+    "Consecutive losses during strong trends (5+ losses in trending markets)",
+    "Entry timing suboptimal in ranging market (late entries reduce profit)",
+    "Stop loss hit frequently during volatile periods (30% of trades)"
+  ],
+  "performance_breakdown": {
+    "by_market_condition": {
+      "trending": {
+        "win_rate": 0.38,
+        "avg_return": -0.005,
+        "comment": "Strategy underperforms in trends"
+      },
+      "ranging": {
+        "win_rate": 0.67,
+        "avg_return": 0.042,
+        "comment": "Strategy excels in sideways markets"
+      }
+    },
+    "by_time_of_day": {
+      "asian_session": {"win_rate": 0.48},
+      "london_session": {"win_rate": 0.54},
+      "ny_session": {"win_rate": 0.53}
+    }
+  },
+  "next_iteration_plan": {
+    "focus": "Add trend filter (ADX > 25)",
+    "rationale": "Avoid mean reversion signals in trending markets to reduce consecutive losses",
+    "expected_improvement": "Reduce consecutive losses by 30%, maintain win rate in ranging markets",
+    "implementation_steps": [
+      "Calculate ADX(14) indicator",
+      "Add condition: only trade when ADX < 25 (non-trending)",
+      "Test with same dataset to measure improvement"
+    ]
+  }
+}

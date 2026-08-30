@@ -1,0 +1,29 @@
+{
+  "strategy_id": "example_strategy",
+  "strategy_lineage": [
+    {
+      "version": "v1",
+      "date": "2026-08-30",
+      "changes": "Initial implementation",
+      "backtest_results": {
+        "sharpe_ratio": 0.0,
+        "max_drawdown": 0.0,
+        "win_rate": 0.0,
+        "total_return": 0.0
+      },
+      "lesson": "First iteration - baseline performance"
+    }
+  ],
+  "learned_patterns": [
+    "Example: RSI mean reversion works best in sideways markets (ADX < 25)",
+    "Example: Position sizing should scale with volatility (ATR)"
+  ],
+  "failed_approaches": [
+    "Example: Fixed stop loss (5%) - too tight, stopped out prematurely",
+    "Example: RSI period 14 - too slow, late entries"
+  ],
+  "market_insights": [
+    "Example: BTC shows stronger mean reversion on weekends",
+    "Example: High volatility periods require wider stops"
+  ]
+}
