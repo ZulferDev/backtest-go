@@ -178,7 +178,7 @@ func TestKillSwitch(t *testing.T) {
 		Size: 2.0,
 		Side: "long",
 	}
-	shouldKill, reason = ks2.Evaluate(10000, 10000, largePos)
+	shouldKill, _ = ks2.Evaluate(10000, 10000, largePos)
 	if !shouldKill {
 		t.Error("Should trigger on oversized position")
 	}
