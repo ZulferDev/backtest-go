@@ -120,8 +120,8 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 **Objective: Optimisasi massal dan deploy**
 
 #### Sub-phase 4.1: Mass Optimization
-- [ ] Parallel strategy execution (test ratusan kode AI serentak)
-- [ ] Parameter space search assistance
+- [x] Parallel strategy execution (test ratusan kode AI serentak)
+- [x] Parameter space search assistance
 
 #### Sub-phase 4.2: Real-time Simulation (Paper Trading)
 - [ ] WebSocket market data listener
