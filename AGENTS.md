@@ -128,8 +128,8 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [x] Paper trading execution state
 
 #### Sub-phase 4.3: Deployment Automation
-- [ ] Live execution bridge
-- [ ] Alerting & Kill switches
+- [x] Live execution bridge
+- [x] Alerting & Kill switches
 
 ---
 
