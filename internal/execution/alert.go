@@ -108,7 +108,7 @@ func (am *AlertManager) Send(alert Alert) {
 	// Write to log file
 	if am.logFile != nil {
 		alertJSON, _ := json.Marshal(alert)
-		am.logFile.Write(append(alertJSON, '\n'))
+		_, _ = am.logFile.Write(append(alertJSON, '\n'))
 	}
 	am.mu.Unlock()
 	
