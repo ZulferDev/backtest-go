@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/ZulferDev/backtest-go/internal/validator"
 )
 
 // runLintPhase validates strategy code with AST checker
@@ -17,13 +19,27 @@ func runLintPhase(strategyID string, version int) error {
 		return fmt.Errorf("strategy file not found: %s", strategyFile)
 	}
 
-	// Run AST validator
-	cmd := exec.Command("go", "run", "internal/validator/cli/main.go", strategyFile)
-	output, err := cmd.CombinedOutput()
+	// Read strategy file
+	src, err := os.ReadFile(strategyFile)
+	if err != nil {
+		return fmt.Errorf("failed to read strategy file: %w", err)
+	}
 
-	// Log output
+	// Run AST validator
+	validationErrors, err := validator.ValidateStrategy(strategyFile, src)
+
+	// Log results
 	logPath := filepath.Join(strategyDir, "validation_errors.log")
-	logEntry := fmt.Sprintf("\n=== LINT v%d ===\n%s\n", version, string(output))
+	logEntry := fmt.Sprintf("\n=== LINT v%d ===\n", version)
+	
+	if len(validationErrors) > 0 {
+		logEntry += "Validation errors found:\n"
+		for _, verr := range validationErrors {
+			logEntry += fmt.Sprintf("  %s: %s\n", verr.Pos, verr.Message)
+		}
+	} else {
+		logEntry += "✓ No validation errors\n"
+	}
 	
 	logFile, _ := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if logFile != nil {
@@ -31,8 +47,13 @@ func runLintPhase(strategyID string, version int) error {
 		logFile.Close()
 	}
 
+	// Return error if validation failed
 	if err != nil {
-		return fmt.Errorf("validation failed: %w\nOutput: %s", err, string(output))
+		return fmt.Errorf("validation failed: %w", err)
+	}
+
+	if len(validationErrors) > 0 {
+		return fmt.Errorf("found %d validation error(s) - check validation_errors.log", len(validationErrors))
 	}
 
 	return nil
