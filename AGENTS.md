@@ -105,14 +105,14 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [x] Error feedback loop (compile errors, validation errors)
 
 #### Sub-phase 3.2: Analytical Feedback Loop
-- [ ] Parser `results.json` ke format ringkas untuk prompt AI
-- [ ] Framework evaluasi hipotesa (bandingkan ekspektasi vs realita backtest)
-- [ ] Memory state untuk menyimpan "insight riset"
+- [x] Parser `results.json` ke format ringkas untuk prompt AI
+- [x] Framework evaluasi hipotesa (bandingkan ekspektasi vs realita backtest)
+- [x] Memory state untuk menyimpan "insight riset"
 
 #### Sub-phase 3.3: Overfitting Prevention
-- [ ] Walk-forward test orchestrator
-- [ ] In-sample vs Out-of-sample gap analyzer
-- [ ] AI prompt khusus untuk mendeteksi curve-fitting
+- [x] Walk-forward test orchestrator
+- [x] In-sample vs Out-of-sample gap analyzer
+- [x] AI prompt khusus untuk mendeteksi curve-fitting
 
 ---
 
