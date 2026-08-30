@@ -218,11 +218,15 @@ func (s *tradingStrategy) OnBar(ctx sdk.BarContext, bar sdk.OHLCV) error {
 	// Simple strategy: buy on first bar, sell on second
 	if s.tradeCount == 0 && !ctx.HasOpenPosition() {
 		s.t.Log("Opening long position")
-		ctx.MarketBuy(0.01)
+		if err := ctx.MarketBuy(0.01); err != nil {
+			s.t.Logf("MarketBuy error: %v", err)
+		}
 		s.tradeCount++
 	} else if s.tradeCount == 1 && ctx.HasOpenPosition() {
 		s.t.Log("Closing position")
-		ctx.CloseAll()
+		if err := ctx.CloseAll(); err != nil {
+			s.t.Logf("CloseAll error: %v", err)
+		}
 		s.tradeCount++
 	}
 	return nil

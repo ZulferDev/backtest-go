@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -145,7 +144,7 @@ func printSummary(state *paper.TradingState) {
 	} else {
 		log.Println("Current Position: None")
 	}
-	log.Println("=============================\n")
+	log.Println("=============================")
 }
 
 // MonitorStrategy is a simple example strategy for monitoring
@@ -160,14 +159,4 @@ func (s *MonitorStrategy) OnBar(ctx sdk.BarContext, bar sdk.OHLCV) error {
 	// This is a passive monitoring strategy - no trades
 	// Replace with actual strategy logic for active trading
 	return nil
-}
-
-// Helper to print state as JSON
-func printStateJSON(state *paper.TradingState) {
-	data, err := json.MarshalIndent(state, "", "  ")
-	if err != nil {
-		log.Printf("Failed to marshal state: %v", err)
-		return
-	}
-	fmt.Println(string(data))
 }
