@@ -40,7 +40,10 @@ StepDays:        30,
 
 orchestrator := NewWalkForwardOrchestrator(config)
 startDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-orchestrator.InitializeSegments(startDate)
+err := orchestrator.InitializeSegments(startDate)
+if err != nil {
+t.Fatalf("Failed to initialize segments: %v", err)
+}
 
 isMetrics := SummaryMetrics{
 TotalTrades:  50,
@@ -68,7 +71,7 @@ AverageWin:   45.0,
 AverageLoss:  -28.0,
 }
 
-err := orchestrator.UpdateSegmentMetrics("WF-001", isMetrics, oosMetrics)
+err = orchestrator.UpdateSegmentMetrics("WF-001", isMetrics, oosMetrics)
 if err != nil {
 t.Fatalf("Failed to update segment metrics: %v", err)
 }
@@ -102,7 +105,10 @@ StepDays:        30,
 
 orchestrator := NewWalkForwardOrchestrator(config)
 startDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-orchestrator.InitializeSegments(startDate)
+err := orchestrator.InitializeSegments(startDate)
+if err != nil {
+t.Fatalf("Failed to initialize segments: %v", err)
+}
 
 segments := []struct {
 id        string
@@ -135,7 +141,10 @@ SharpeRatio:  s.oosSharpe,
 AverageWin:   42.0,
 AverageLoss:  -27.0,
 }
-orchestrator.UpdateSegmentMetrics(s.id, isMetrics, oosMetrics)
+err = orchestrator.UpdateSegmentMetrics(s.id, isMetrics, oosMetrics)
+if err != nil {
+t.Fatalf("Failed to update segment metrics for %s: %v", s.id, err)
+}
 }
 
 result, err := orchestrator.Analyze()
