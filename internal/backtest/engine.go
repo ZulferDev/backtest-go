@@ -2,15 +2,17 @@ package backtest
 
 import (
 	"fmt"
+	"github.com/ZulferDev/backtest-go/internal/execution"
 	"github.com/ZulferDev/backtest-go/pkg/data"
 	"github.com/ZulferDev/backtest-go/pkg/sdk"
 )
 
 // Engine is the core backtest execution engine
 type Engine struct {
-	strategy sdk.Strategy
-	data     []data.OHLCV
-	state    *State
+	strategy     sdk.Strategy
+	data         []data.OHLCV
+	state        *State
+	executionSim *execution.ExecutionSimulator
 }
 
 // State holds the current backtest state
@@ -28,6 +30,7 @@ type Position struct {
 	size       float64
 	entryPrice float64
 	entryTime  int64
+	entryFee   float64
 }
 
 func (p *Position) Size() float64 {

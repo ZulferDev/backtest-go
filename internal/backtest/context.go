@@ -58,15 +58,27 @@ func (c *barContext) MarketBuy(quantity float64) error {
 		return fmt.Errorf("position already open")
 	}
 
-	// Simulate market execution at next bar open (realistic fill)
-	// For now, use current close as approximation
-	fillPrice := c.currentBar.Close
+	// Use current close as base price
+	basePrice := c.currentBar.Close
+	
+	// Apply fees and slippage if configured
+	fillPrice := basePrice
+	fee := 0.0
+	
+	if c.engine.executionSim != nil {
+		var err error
+		fillPrice, _, fee, err = c.engine.executionSim.SimulateExecution(basePrice, quantity, "buy")
+		if err != nil {
+			return fmt.Errorf("execution simulation failed: %w", err)
+		}
+	}
 
 	c.engine.state.position = &Position{
 		side:       "long",
 		size:       quantity,
 		entryPrice: fillPrice,
 		entryTime:  c.currentBar.Timestamp,
+		entryFee:   fee,
 	}
 
 	return nil
@@ -80,13 +92,27 @@ func (c *barContext) MarketSell(quantity float64) error {
 		return fmt.Errorf("position already open")
 	}
 
-	fillPrice := c.currentBar.Close
+	// Use current close as base price
+	basePrice := c.currentBar.Close
+	
+	// Apply fees and slippage if configured
+	fillPrice := basePrice
+	fee := 0.0
+	
+	if c.engine.executionSim != nil {
+		var err error
+		fillPrice, _, fee, err = c.engine.executionSim.SimulateExecution(basePrice, quantity, "sell")
+		if err != nil {
+			return fmt.Errorf("execution simulation failed: %w", err)
+		}
+	}
 
 	c.engine.state.position = &Position{
 		side:       "short",
 		size:       quantity,
 		entryPrice: fillPrice,
 		entryTime:  c.currentBar.Timestamp,
+		entryFee:   fee,
 	}
 
 	return nil
@@ -98,8 +124,27 @@ func (c *barContext) CloseAll() error {
 	}
 
 	pos := c.engine.state.position
-	exitPrice := c.currentBar.Close
+	basePrice := c.currentBar.Close
+	
+	// Apply fees and slippage for exit
+	exitPrice := basePrice
+	exitFee := 0.0
+	
+	if c.engine.executionSim != nil {
+		var err error
+		side := "sell"
+		if pos.side == "short" {
+			side = "buy" // Close short = buy
+		}
+		exitPrice, _, exitFee, err = c.engine.executionSim.SimulateExecution(basePrice, pos.size, side)
+		if err != nil {
+			return fmt.Errorf("execution simulation failed: %w", err)
+		}
+	}
+	
 	pnl := pos.UnrealizedPnL(exitPrice)
+	totalFee := pos.entryFee + exitFee
+	pnl -= totalFee // Subtract fees from PnL
 
 	// Record trade
 	trade := Trade{
@@ -110,7 +155,7 @@ func (c *barContext) CloseAll() error {
 		EntryTime:  pos.entryTime,
 		ExitTime:   c.currentBar.Timestamp,
 		PnL:        pnl,
-		Fee:        0, // TODO: implement fee calculation
+		Fee:        totalFee,
 	}
 
 	c.engine.state.trades = append(c.engine.state.trades, trade)
