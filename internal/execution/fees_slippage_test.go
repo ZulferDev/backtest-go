@@ -1,8 +1,15 @@
 package execution
 
 import (
+	"math"
 	"testing"
 )
+
+const epsilon = 1e-9 // Tolerance for floating point comparison
+
+func almostEqual(a, b float64) bool {
+	return math.Abs(a-b) < epsilon
+}
 
 func TestFixedPercentageFee(t *testing.T) {
 	fee := NewFixedPercentageFee(0.001) // 0.1%
@@ -10,7 +17,7 @@ func TestFixedPercentageFee(t *testing.T) {
 	result := fee.Calculate(50000, 1.0, "buy")
 	expected := 50.0 // 50000 * 1.0 * 0.001
 	
-	if result != expected {
+	if !almostEqual(result, expected) {
 		t.Errorf("Expected fee %.2f, got %.2f", expected, result)
 	}
 }
@@ -21,7 +28,7 @@ func TestMakerTakerFee(t *testing.T) {
 	result := fee.Calculate(50000, 1.0, "buy")
 	expected := 30.0 // 50000 * 1.0 * 0.0006 (taker)
 	
-	if result != expected {
+	if !almostEqual(result, expected) {
 		t.Errorf("Expected taker fee %.2f, got %.2f", expected, result)
 	}
 }
@@ -36,7 +43,7 @@ func TestTieredFee(t *testing.T) {
 	result := fee.Calculate(50000, 1.0, "buy")
 	expected := 50.0 // First tier: 50000 * 0.001
 	
-	if result != expected {
+	if !almostEqual(result, expected) {
 		t.Errorf("Expected fee %.2f, got %.2f", expected, result)
 	}
 }
@@ -48,7 +55,7 @@ func TestFixedSlippage(t *testing.T) {
 	buyPrice := slippage.Apply(50000, 1.0, "buy")
 	expectedBuy := 50050.0 // 50000 * 1.001
 	
-	if buyPrice != expectedBuy {
+	if !almostEqual(buyPrice, expectedBuy) {
 		t.Errorf("Expected buy price %.2f, got %.2f", expectedBuy, buyPrice)
 	}
 	
@@ -56,7 +63,7 @@ func TestFixedSlippage(t *testing.T) {
 	sellPrice := slippage.Apply(50000, 1.0, "sell")
 	expectedSell := 49950.0 // 50000 * 0.999
 	
-	if sellPrice != expectedSell {
+	if !almostEqual(sellPrice, expectedSell) {
 		t.Errorf("Expected sell price %.2f, got %.2f", expectedSell, sellPrice)
 	}
 }
@@ -70,7 +77,7 @@ func TestVolumeBasedSlippage(t *testing.T) {
 	// Total slippage: 5 + (2 * 1.0/1.0) = 7 bps = 0.07%
 	expectedSmall := 50035.0 // 50000 * 1.0007
 	
-	if smallPrice != expectedSmall {
+	if !almostEqual(smallPrice, expectedSmall) {
 		t.Errorf("Expected small order price %.2f, got %.2f", expectedSmall, smallPrice)
 	}
 	
@@ -79,7 +86,7 @@ func TestVolumeBasedSlippage(t *testing.T) {
 	// Total slippage: 5 + (2 * 5.0/1.0) = 15 bps = 0.15%
 	expectedLarge := 50075.0 // 50000 * 1.0015
 	
-	if largePrice != expectedLarge {
+	if !almostEqual(largePrice, expectedLarge) {
 		t.Errorf("Expected large order price %.2f, got %.2f", expectedLarge, largePrice)
 	}
 }
@@ -94,7 +101,7 @@ func TestSpreadBasedSlippage(t *testing.T) {
 	buyPrice := slippage.Apply(50000, 1.0, "buy")
 	expectedBuy := 50075.0 // 50000 * 1.0015
 	
-	if buyPrice != expectedBuy {
+	if !almostEqual(buyPrice, expectedBuy) {
 		t.Errorf("Expected buy price %.2f, got %.2f", expectedBuy, buyPrice)
 	}
 	
@@ -102,7 +109,7 @@ func TestSpreadBasedSlippage(t *testing.T) {
 	sellPrice := slippage.Apply(50000, 1.0, "sell")
 	expectedSell := 49925.0 // 50000 * 0.9985
 	
-	if sellPrice != expectedSell {
+	if !almostEqual(sellPrice, expectedSell) {
 		t.Errorf("Expected sell price %.2f, got %.2f", expectedSell, sellPrice)
 	}
 }
@@ -124,15 +131,15 @@ func TestExecutionSimulator(t *testing.T) {
 	expectedFee := 50.05          // 50050 * 1.0 * 0.001
 	expectedTotalCost := 50100.05 // 50050 + 50.05
 	
-	if fillPrice != expectedFillPrice {
+	if !almostEqual(fillPrice, expectedFillPrice) {
 		t.Errorf("Expected fill price %.2f, got %.2f", expectedFillPrice, fillPrice)
 	}
 	
-	if fee != expectedFee {
+	if !almostEqual(fee, expectedFee) {
 		t.Errorf("Expected fee %.2f, got %.2f", expectedFee, fee)
 	}
 	
-	if totalCost != expectedTotalCost {
+	if !almostEqual(totalCost, expectedTotalCost) {
 		t.Errorf("Expected total cost %.2f, got %.2f", expectedTotalCost, totalCost)
 	}
 }
@@ -156,7 +163,7 @@ func TestBinancePreset(t *testing.T) {
 	result := fee.Calculate(50000, 1.0, "buy")
 	expected := 50.0 // 0.1% taker fee
 	
-	if result != expected {
+	if !almostEqual(result, expected) {
 		t.Errorf("Binance fee: expected %.2f, got %.2f", expected, result)
 	}
 }
@@ -166,7 +173,7 @@ func TestBybitPreset(t *testing.T) {
 	result := fee.Calculate(50000, 1.0, "buy")
 	expected := 30.0 // 0.06% taker fee
 	
-	if result != expected {
+	if !almostEqual(result, expected) {
 		t.Errorf("Bybit fee: expected %.2f, got %.2f", expected, result)
 	}
 }
@@ -176,7 +183,7 @@ func TestDefaultSlippage(t *testing.T) {
 	buyPrice := slippage.Apply(50000, 1.0, "buy")
 	expectedBuy := 50025.0 // 5 bps = 0.05%
 	
-	if buyPrice != expectedBuy {
+	if !almostEqual(buyPrice, expectedBuy) {
 		t.Errorf("Default slippage: expected %.2f, got %.2f", expectedBuy, buyPrice)
 	}
 }
@@ -193,11 +200,6 @@ func TestRealisticScenario(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	
-	t.Logf("Buy 0.5 BTC @ $50000:")
-	t.Logf("  Fill price: $%.2f (slippage applied)", fillPrice)
-	t.Logf("  Fee: $%.2f", fee)
-	t.Logf("  Total cost: $%.2f", totalCost)
 	
 	// Verify reasonable values
 	if fillPrice < 50000 {

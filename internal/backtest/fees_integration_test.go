@@ -1,12 +1,19 @@
 package backtest
 
 import (
+	"math"
 	"testing"
 
 	"github.com/ZulferDev/backtest-go/internal/execution"
 	"github.com/ZulferDev/backtest-go/pkg/data"
 	"github.com/ZulferDev/backtest-go/pkg/sdk"
 )
+
+const epsilon = 1e-6 // Tolerance for floating point comparison
+
+func almostEqual(a, b float64) bool {
+	return math.Abs(a-b) < epsilon
+}
 
 // Simple test strategy for fees/slippage testing
 type SimpleTestStrategy struct {
@@ -105,19 +112,19 @@ func TestEngineWithFeesAndSlippage(t *testing.T) {
 		expectedTotalFee := 100.999
 		expectedPnL := (expectedExitPrice - expectedEntryPrice) - expectedTotalFee
 		
-		if trade.EntryPrice != expectedEntryPrice {
+		if !almostEqual(trade.EntryPrice, expectedEntryPrice) {
 			t.Errorf("Expected entry price %.2f, got %.2f", expectedEntryPrice, trade.EntryPrice)
 		}
 		
-		if trade.ExitPrice != expectedExitPrice {
+		if !almostEqual(trade.ExitPrice, expectedExitPrice) {
 			t.Errorf("Expected exit price %.2f, got %.2f", expectedExitPrice, trade.ExitPrice)
 		}
 		
-		if trade.Fee != expectedTotalFee {
+		if !almostEqual(trade.Fee, expectedTotalFee) {
 			t.Errorf("Expected total fee %.3f, got %.3f", expectedTotalFee, trade.Fee)
 		}
 		
-		if trade.PnL != expectedPnL {
+		if !almostEqual(trade.PnL, expectedPnL) {
 			t.Errorf("Expected PnL %.3f, got %.3f", expectedPnL, trade.PnL)
 		}
 		
@@ -210,7 +217,7 @@ func TestVolumeBasedSlippage(t *testing.T) {
 	// Base 5 bps + (2 bps * 1.0/1.0) = 7 bps total
 	expectedEntryPrice := 50000.0 * 1.0007 // 50035
 	
-	if trade.EntryPrice != expectedEntryPrice {
+	if !almostEqual(trade.EntryPrice, expectedEntryPrice) {
 		t.Errorf("Expected entry price %.2f with volume slippage, got %.2f", expectedEntryPrice, trade.EntryPrice)
 	}
 }
