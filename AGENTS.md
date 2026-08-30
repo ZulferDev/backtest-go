@@ -103,11 +103,15 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [x] System prompt untuk AI code generator
 - [x] Pipeline: AI tulis `.go` -> CLI baca -> Lint AST -> Test -> Backtest
 - [x] Error feedback loop (compile errors, validation errors)
+- [ ] **Orchestrator CLI** - Automated end-to-end execution (PRIORITY)
+- [ ] **Context Window Management** - Focused prompts to prevent hallucination
 
 #### Sub-phase 3.2: Analytical Feedback Loop
 - [x] Parser `results.json` ke format ringkas untuk prompt AI
 - [x] Framework evaluasi hipotesa (bandingkan ekspektasi vs realita backtest)
 - [x] Memory state untuk menyimpan "insight riset"
+- [ ] **Research Memory Database** - SQLite persistent storage for learning
+- [ ] **Structured Feedback Format** - JSON schema for AI consumption
 
 #### Sub-phase 3.3: Overfitting Prevention
 - [x] Walk-forward test orchestrator
@@ -161,3 +165,266 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 6. ANALYZE  : AI baca JSON metric & equity curve. Cari kelemahan (misal: "Drawdown besar saat sideways").
 7. REFINE   : AI memodifikasi kode `.go` untuk menambahkan filter/logic baru.
 ```
+
+---
+
+## AI Workflow Rules (STRICT - Anti-Hallucination)
+
+### Context Window Management
+AI agent memiliki konteks window terbatas. Untuk menghindari halusinasi dan mempertahankan fokus:
+
+#### Rule 1: One Task, One Context
+- **SETIAP FASE** lifecycle harus dijalankan dalam konteks terpisah
+- Jangan mencampur CONCEIVE + WRITE dalam satu prompt
+- Jangan mencampur BACKTEST + ANALYZE dalam satu execution
+- Gunakan file intermediary untuk pass data antar fase
+
+#### Rule 2: Explicit State Management
+- AI WAJIB membaca state dari file sebelum melanjutkan:
+  - `research_logs/<strategy_id>/hypothesis.md` - Apa yang ingin dicapai
+  - `research_logs/<strategy_id>/strategy.go` - Kode strategi saat ini
+  - `research_logs/<strategy_id>/results.json` - Hasil backtest terakhir
+  - `research_logs/<strategy_id>/memory.json` - Pembelajaran masa lalu
+- Jangan assume/remember dari percakapan sebelumnya
+- Selalu verify dengan read file actual
+
+#### Rule 3: Incremental Refinement
+- Setiap iterasi hanya boleh mengubah **SATU ASPEK** dari strategi:
+  - Iterasi 1: Tambah filter trend (ADX)
+  - Iterasi 2: Adjust position sizing
+  - Iterasi 3: Tambah stop loss
+- DILARANG rewrite seluruh strategi sekaligus
+- Setiap perubahan harus traceable dan reversible
+
+#### Rule 4: Validation Gates
+Setiap output AI harus melewati gate sebelum lanjut:
+- **WRITE → LINT**: AST validation wajib pass
+- **LINT → TEST**: Unit test wajib pass (no panic)
+- **TEST → BACKTEST**: Compile wajib sukses
+- **BACKTEST → ANALYZE**: Results.json wajib exist dan valid JSON
+- Jika gate gagal, AI harus fix di konteks yang sama sebelum lanjut
+
+#### Rule 5: Structured Output Format
+AI output harus mengikuti schema ketat:
+
+**CONCEIVE Phase Output:**
+```markdown
+# Hypothesis: [Nama Strategi]
+
+## Market Observation
+- [Observasi 1]
+- [Observasi 2]
+
+## Core Thesis
+[Penjelasan hipotesa dalam 2-3 kalimat]
+
+## Expected Edge
+- Entry: [Kapan buy/sell]
+- Exit: [Kapan close]
+- Risk: [Bagaimana manage risk]
+
+## Success Criteria
+- Sharpe Ratio > 1.5
+- Max Drawdown < 15%
+- Win Rate > 45%
+```
+
+**ANALYZE Phase Output:**
+```json
+{
+  "strategy_id": "rsi_mean_reversion_v1",
+  "backtest_results": {
+    "total_return": 0.234,
+    "sharpe_ratio": 1.82,
+    "max_drawdown": 0.12,
+    "win_rate": 0.52
+  },
+  "hypothesis_validation": {
+    "thesis_confirmed": true,
+    "evidence": ["Sharpe > 1.5 achieved", "Drawdown within limit"]
+  },
+  "identified_weaknesses": [
+    "Consecutive losses during strong trends",
+    "Entry timing suboptimal in ranging market"
+  ],
+  "next_iteration_plan": {
+    "focus": "Add trend filter (ADX > 25)",
+    "rationale": "Avoid mean reversion in trending markets",
+    "expected_improvement": "Reduce consecutive losses by 30%"
+  }
+}
+```
+
+#### Rule 6: Memory Persistence
+Setiap iterasi AI WAJIB update memory file:
+
+```json
+{
+  "strategy_lineage": [
+    {
+      "version": "v1",
+      "date": "2026-08-30",
+      "changes": "Initial RSI mean reversion",
+      "result": {"sharpe": 1.2, "drawdown": 0.18},
+      "lesson": "RSI alone insufficient, trending markets cause losses"
+    },
+    {
+      "version": "v2",
+      "date": "2026-08-30",
+      "changes": "Added ADX trend filter",
+      "result": {"sharpe": 1.82, "drawdown": 0.12},
+      "lesson": "Trend filter significantly improved performance"
+    }
+  ],
+  "learned_patterns": [
+    "RSI mean reversion works best in sideways markets (ADX < 25)",
+    "Position sizing should scale with volatility (ATR)"
+  ],
+  "failed_approaches": [
+    "Fixed stop loss (5%) - too tight, stopped out prematurely",
+    "RSI period 14 - too slow, late entries"
+  ]
+}
+```
+
+#### Rule 7: Error Recovery Protocol
+Jika AI encounter error:
+1. **Compile Error**: Read compiler output, fix syntax only, re-validate
+2. **AST Validation Error**: Read validator output, remove unsafe imports/code
+3. **Test Failure**: Read test output, fix logic bug, re-run test
+4. **Backtest Error**: Read error log, check data availability or logic error
+5. **Max 3 attempts** per gate - jika masih gagal, flag for human review
+
+---
+
+## Orchestrator CLI Specification
+
+Orchestrator adalah automation layer yang menjalankan full lifecycle:
+
+### Command Structure
+```bash
+# Initialize new research session
+go run cmd/orchestrator/main.go init \
+  --strategy-id "rsi_mean_reversion" \
+  --hypothesis-file "hypothesis.md"
+
+# Run full cycle (WRITE → LINT → TEST → BACKTEST → ANALYZE)
+go run cmd/orchestrator/main.go run \
+  --strategy-id "rsi_mean_reversion" \
+  --data-file "data/BTCUSDT_1h.json" \
+  --ai-model "gpt-4"
+
+# Run single phase (for debugging)
+go run cmd/orchestrator/main.go phase \
+  --strategy-id "rsi_mean_reversion" \
+  --phase "BACKTEST"
+
+# View research history
+go run cmd/orchestrator/main.go history \
+  --strategy-id "rsi_mean_reversion"
+```
+
+### Orchestrator Responsibilities
+1. **State Management**: Create/read/update research_logs directory structure
+2. **Phase Execution**: Call appropriate Go packages (validator, backtest, analyzer)
+3. **Gate Enforcement**: Block progression if validation fails
+4. **Context Isolation**: Each phase runs in clean environment
+5. **Error Logging**: Structured error output for AI consumption
+6. **Memory Updates**: Auto-update memory.json after each cycle
+
+### Directory Structure
+```
+research_logs/
+├── rsi_mean_reversion/
+│   ├── hypothesis.md          # Initial thesis
+│   ├── strategy_v1.go         # Version 1 code
+│   ├── strategy_v2.go         # Version 2 code (after refinement)
+│   ├── strategy_current.go    # Symlink to latest version
+│   ├── results_v1.json        # Backtest results v1
+│   ├── results_v2.json        # Backtest results v2
+│   ├── memory.json            # Accumulated learning
+│   ├── validation_errors.log  # AST/Test errors (if any)
+│   └── analysis_v2.json       # Structured analysis output
+└── sma_crossover/
+    └── ...
+```
+
+---
+
+## AI Prompt Templates
+
+### CONCEIVE Phase Prompt
+```
+You are a quantitative researcher. Based on market observation, formulate a trading hypothesis.
+
+Context:
+- Market: Cryptocurrency (BTCUSDT)
+- Timeframe: 1 hour
+- Available indicators: SMA, EMA, RSI, MACD, ATR, Bollinger Bands
+- Risk management: Position sizing, stop loss, trailing stop
+
+Task:
+Write a hypothesis.md file following the structured format.
+Focus on ONE clear edge. Do not write code yet.
+
+Output: hypothesis.md content only.
+```
+
+### WRITE Phase Prompt
+```
+You are a Go developer implementing a trading strategy.
+
+Context:
+- Read hypothesis from: research_logs/{strategy_id}/hypothesis.md
+- Implement interface: pkg/sdk.Strategy (Init, OnBar methods)
+- Use SDK methods: ctx.Buy(), ctx.Sell(), ctx.CloseAll()
+- Use indicators: ctx.Indicator.SMA(), ctx.Indicator.RSI(), etc.
+
+Constraints:
+- No imports beyond SDK and indicators packages
+- No goroutines, no channels
+- Deterministic logic only
+- Add // RATIONALE: comments explaining logic
+
+Task:
+Write complete strategy.go file implementing the hypothesis.
+
+Output: Go code only, no markdown fences.
+```
+
+### ANALYZE Phase Prompt
+```
+You are a quantitative analyst evaluating backtest results.
+
+Context:
+- Strategy hypothesis: [read from hypothesis.md]
+- Backtest results: [read from results.json]
+- Previous iterations: [read from memory.json]
+
+Task:
+1. Validate if hypothesis was confirmed or rejected
+2. Identify specific weaknesses (e.g., "losses during trend", "late entries")
+3. Propose ONE focused improvement for next iteration
+4. Update memory.json with learnings
+
+Output: analysis.json in structured format.
+```
+
+---
+
+## Success Metrics for AI Pipeline
+
+### Phase 3 Complete When:
+- [ ] Orchestrator CLI dapat run full cycle tanpa manual intervention
+- [ ] AI dapat generate valid strategy code (pass AST validation) in 1-2 attempts
+- [ ] AI dapat analyze results dan propose refinement dengan reasoning clear
+- [ ] Memory system dapat track 5+ iterations dengan lineage jelas
+- [ ] Walk-forward test menunjukkan AI tidak overfit (IS/OOS gap < 10%)
+- [ ] Documentation lengkap untuk setup AI agent (LLM API keys, prompts)
+
+### Anti-Hallucination Validation:
+- [ ] AI tidak assume data yang tidak ada di file
+- [ ] AI tidak generate random parameters tanpa reasoning
+- [ ] AI tidak claim performance improvement tanpa backtest evidence
+- [ ] AI dapat recover dari errors dalam max 3 attempts
+- [ ] AI learning terdokumentasi dan traceable di memory.json
