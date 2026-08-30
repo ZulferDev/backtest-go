@@ -55,19 +55,3 @@ func NewEngineWithConfig(strategy sdk.Strategy, historicalData []data.OHLCV, ini
 	
 	return engine
 }
-
-// applyExecutionCosts applies fees and slippage to order execution
-func (e *Engine) applyExecutionCosts(price, quantity float64, side string) (fillPrice float64, fee float64) {
-	if e.executionSim == nil {
-		// No execution costs
-		return price, 0
-	}
-	
-	fillPrice, _, fee, err := e.executionSim.SimulateExecution(price, quantity, side)
-	if err != nil {
-		// Fallback to no costs if simulation fails
-		return price, 0
-	}
-	
-	return fillPrice, fee
-}

@@ -162,24 +162,24 @@ func generateKey(name string, data []float64, period int) string {
 func hashFloats(data []float64) []byte {
 	h := sha256.New()
 	
-	// Write length
-	binary.Write(h, binary.LittleEndian, int64(len(data)))
+	// Write length (ignore error - sha256 hash.Hash never returns an error)
+	_ = binary.Write(h, binary.LittleEndian, int64(len(data)))
 	
 	// Sample data points for hash (first, last, middle, and a few random)
 	// This is faster than hashing all data for large datasets
 	if len(data) > 0 {
-		binary.Write(h, binary.LittleEndian, data[0])
-		binary.Write(h, binary.LittleEndian, data[len(data)-1])
+		_ = binary.Write(h, binary.LittleEndian, data[0])
+		_ = binary.Write(h, binary.LittleEndian, data[len(data)-1])
 		
 		if len(data) > 2 {
-			binary.Write(h, binary.LittleEndian, data[len(data)/2])
+			_ = binary.Write(h, binary.LittleEndian, data[len(data)/2])
 		}
 		
 		// Sample a few more points
 		step := len(data) / 10
 		if step > 0 {
 			for i := step; i < len(data); i += step {
-				binary.Write(h, binary.LittleEndian, data[i])
+				_ = binary.Write(h, binary.LittleEndian, data[i])
 			}
 		}
 	}

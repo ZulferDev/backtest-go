@@ -106,7 +106,9 @@ func TestPaperTradingWebSocketSimulation(t *testing.T) {
 
 	// Initialize
 	initCtx := paper.NewInitContext(executor)
-	strategy.Init(initCtx)
+	if err := strategy.Init(initCtx); err != nil {
+		t.Fatalf("Strategy init failed: %v", err)
+	}
 
 	// Simulate receiving WebSocket messages
 	mockBars := []sdk.OHLCV{

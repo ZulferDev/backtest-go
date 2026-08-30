@@ -134,20 +134,13 @@ func TestHTMLReportGeneration(t *testing.T) {
 
 func TestHTMLReportWithNoTrades(t *testing.T) {
 	// Strategy that never trades
-	type NoTradeStrategy struct{}
-	
-	// Implement Init and OnBar for NoTradeStrategy inline
-	var noTradeInit = func(ctx sdk.InitContext) error {
-		return nil
-	}
-	var noTradeOnBar = func(ctx sdk.BarContext, bar sdk.OHLCV) error {
-		return nil
-	}
-	
-	// Create wrapper
 	noTrade := &noTradeStrategyImpl{
-		initFn: noTradeInit,
-		onBarFn: noTradeOnBar,
+		initFn: func(ctx sdk.InitContext) error {
+			return nil
+		},
+		onBarFn: func(ctx sdk.BarContext, bar sdk.OHLCV) error {
+			return nil
+		},
 	}
 	
 	testData := []data.OHLCV{

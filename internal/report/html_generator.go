@@ -12,7 +12,6 @@ import (
 
 // HTMLGenerator generates HTML reports from backtest results
 type HTMLGenerator struct {
-	templatePath string
 }
 
 // NewHTMLGenerator creates a new HTML report generator

@@ -230,14 +230,14 @@ func TestCachePerformance(t *testing.T) {
 	// Measure uncached performance
 	start := getTimestamp()
 	for i := 0; i < 100; i++ {
-		SMA(data, period)
+		_, _ = SMA(data, period)
 	}
 	uncachedTime := getTimestamp() - start
 	
 	// Measure cached performance
 	start = getTimestamp()
 	for i := 0; i < 100; i++ {
-		CachedSMA(cache, data, period)
+		_, _ = CachedSMA(cache, data, period)
 	}
 	cachedTime := getTimestamp() - start
 	
@@ -304,7 +304,7 @@ func TestConcurrentCacheAccess(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		go func(id int) {
 			for j := 0; j < 100; j++ {
-				CachedSMA(cache, data, 3)
+				_, _ = CachedSMA(cache, data, 3)
 			}
 			done <- true
 		}(i)
