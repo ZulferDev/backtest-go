@@ -155,7 +155,6 @@ func TestPositionManagement(t *testing.T) {
 	}
 
 	trade := executor.state.Trades[0]
-	expectedPnL := (51000.0 - 50000.0) * 0.1
 	// Account for fees
 	if trade.PnL <= 0 {
 		t.Errorf("Expected positive PnL, got %.2f", trade.PnL)
@@ -217,11 +216,11 @@ func (s *tradingStrategy) Init(ctx sdk.InitContext) error {
 
 func (s *tradingStrategy) OnBar(ctx sdk.BarContext, bar sdk.OHLCV) error {
 	// Simple strategy: buy on first bar, sell on second
-	if s.tradeCount == 0 && !ctx.HasPosition() {
+	if s.tradeCount == 0 && !ctx.HasOpenPosition() {
 		s.t.Log("Opening long position")
-		ctx.Buy(0.01)
+		ctx.MarketBuy(0.01)
 		s.tradeCount++
-	} else if s.tradeCount == 1 && ctx.HasPosition() {
+	} else if s.tradeCount == 1 && ctx.HasOpenPosition() {
 		s.t.Log("Closing position")
 		ctx.CloseAll()
 		s.tradeCount++
