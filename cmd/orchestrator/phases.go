@@ -1,12 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 
+	"github.com/ZulferDev/backtest-go/internal/backtest"
+	"github.com/ZulferDev/backtest-go/internal/datafetcher"
 	"github.com/ZulferDev/backtest-go/internal/validator"
+	"github.com/ZulferDev/backtest-go/pkg/sdk"
 )
 
 // runLintPhase validates strategy code with AST checker
