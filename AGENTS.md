@@ -124,8 +124,8 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [x] Parameter space search assistance
 
 #### Sub-phase 4.2: Real-time Simulation (Paper Trading)
-- [ ] WebSocket market data listener
-- [ ] Paper trading execution state
+- [x] WebSocket market data listener
+- [x] Paper trading execution state
 
 #### Sub-phase 4.3: Deployment Automation
 - [ ] Live execution bridge
