@@ -158,10 +158,8 @@ func (g *GridSearch) countValues(r ParameterRange) int {
 
 // RandomSearch generates random parameter combinations
 type RandomSearch struct {
-	ranges      []ParameterRange
-	numSamples  int
-	seed        int64
-	currentIdx  int
+	ranges     []ParameterRange
+	numSamples int
 }
 
 // NewRandomSearch creates a new random search
