@@ -64,7 +64,6 @@ segments: []WalkForwardSegment{},
 type WalkForwardOrchestrator struct {
 config      WalkForwardConfig
 segments    []WalkForwardSegment
-resultsPath string
 }
 
 // InitializeSegments creates walk-forward segments based on config
@@ -301,9 +300,9 @@ if seg.SegmentID == segmentID {
 report := fmt.Sprintf("=== Segment %s ===\n", segmentID)
 report += fmt.Sprintf("In-Sample Period: %s to %s\n", seg.InSampleStart.Format("2006-01-02"), seg.InSampleEnd.Format("2006-01-02"))
 report += fmt.Sprintf("Out-of-Sample Period: %s to %s\n", seg.OutSampleStart.Format("2006-01-02"), seg.OutSampleEnd.Format("2006-01-02"))
-report += fmt.Sprintf("\nIn-Sample Metrics:\n")
+report += "\nIn-Sample Metrics:\n"
 report += fmt.Sprintf("  Return: %.2f%% | Sharpe: %.3f | Win Rate: %.1f%%\n", seg.InSampleMetrics.TotalReturn, seg.InSampleMetrics.SharpeRatio, seg.InSampleMetrics.WinRate)
-report += fmt.Sprintf("\nOut-of-Sample Metrics:\n")
+report += "\nOut-of-Sample Metrics:\n"
 report += fmt.Sprintf("  Return: %.2f%% | Sharpe: %.3f | Win Rate: %.1f%%\n", seg.OutSampleMetrics.TotalReturn, seg.OutSampleMetrics.SharpeRatio, seg.OutSampleMetrics.WinRate)
 
 returnDegradation := 0.0
@@ -330,8 +329,8 @@ report += fmt.Sprintf("- Step Size: %d days\n", r.Config.StepDays)
 report += "\n"
 
 report += "## Overall Performance\n\n"
-report += fmt.Sprintf("| Metric | In-Sample | Out-of-Sample | Degradation |\n")
-report += fmt.Sprintf("|--------|-----------|---------------|-------------|\n")
+report += "| Metric | In-Sample | Out-of-Sample | Degradation |\n"
+report += "|--------|-----------|---------------|-------------|\n"
 report += fmt.Sprintf("| Avg Return | %.2f%% | %.2f%% | %.1f%% |\n", 
 r.OverallMetrics.AvgInSampleReturn, 
 r.OverallMetrics.AvgOutSampleReturn,

@@ -3,85 +3,38 @@
 *.o
 *.obj
 *.out
-*.a
-*.so
-*.dll
-*.exe
-*.pyc
-*.class
-*.jar
-*.war
-*.zip
-*.tar.gz
-*.tar.xz
-*.tar.bz2
-*.gz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
 
 # Dependencies
-node_modules/
-venv/
-.venv/
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-target/
-.gradle/
-build/
-dist/
-out/
+vendor/
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
-*.swo
-*.bak
-*.~
-*~
-
-# Environment
-.env
-.env.local
-.env.*
 
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# System
-.DS_Store
-Thumbs.db
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Icon?
-iTunes_Control/
-*.DS_Store
-*.tmp
-*~
 
 # Coverage
 coverage/
 htmlcov/
 .coverage
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+.eggs/
 
 # Go specific
 *.exe
@@ -90,5 +43,16 @@ htmlcov/
 *.dylib
 *.test
 *.prof
-cover.out
+coverage.out
+
+# Build directories
+dist/
+build/
+target/
+bin/
+_gen/
+
+# OS generated files
+.DS_Store
+Thumbs.db
 ```
