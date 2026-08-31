@@ -68,12 +68,12 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [x] Event-driven Engine (`OnBar`, `OnTick`)
 - [x] **Strategy Context SDK** (Sandboxed API: `ctx.Buy()`, `ctx.CloseAll()`)
 - [x] Execution Simulator (basic implementation)
-- [ ] Advanced Fees & Slippage models (deferred to optimization phase)
+- [x] Advanced Fees & Slippage models
 
 #### Sub-phase 1.3: Metrics & Reporting
 - [x] PnL, Sharpe, Max Drawdown, Sortino
 - [x] JSON trade log & metrics report
-- [ ] HTML Report builder (deferred to Phase 4)
+- [x] HTML Report builder
 
 ---
 
@@ -82,8 +82,8 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 
 #### Sub-phase 2.1: Technical Indicators Library
 - [x] Math primitives (SMA, EMA, RSI, MACD, ATR, Bollinger)
-- [ ] Custom window functions (Rolling min/max, standard deviation) — deferred to Phase 2.2
-- [ ] Caching mekanisme indikator agar kalkulasi efisien — deferred to Phase 4 (optimization)
+- [x] Custom window functions (Rolling min/max, standard deviation)
+- [x] Caching mekanisme indikator agar kalkulasi efisien
 
 #### Sub-phase 2.2: Signal & Risk Management Primitives
 - [x] Position Sizing primitives (Fixed fractional, Kelly criterion)
@@ -103,8 +103,8 @@ Backtest framework ini adalah **research infrastructure** interaktif. AI Agent b
 - [x] System prompt untuk AI code generator
 - [x] Pipeline: AI tulis `.go` -> CLI baca -> Lint AST -> Test -> Backtest
 - [x] Error feedback loop (compile errors, validation errors)
-- [ ] **Orchestrator CLI** - Automated end-to-end execution (PRIORITY)
-- [ ] **Context Window Management** - Focused prompts to prevent hallucination
+- [x] **Orchestrator CLI** - Automated end-to-end execution
+- [x] **Context Window Management** - Focused prompts to prevent hallucination
 
 #### Sub-phase 3.2: Analytical Feedback Loop
 - [x] Parser `results.json` ke format ringkas untuk prompt AI
