@@ -415,16 +415,16 @@ Output: analysis.json in structured format.
 ## Success Metrics for AI Pipeline
 
 ### Phase 3 Complete When:
-- [ ] Orchestrator CLI dapat run full cycle tanpa manual intervention
-- [ ] AI dapat generate valid strategy code (pass AST validation) in 1-2 attempts
-- [ ] AI dapat analyze results dan propose refinement dengan reasoning clear
-- [ ] Memory system dapat track 5+ iterations dengan lineage jelas
-- [ ] Walk-forward test menunjukkan AI tidak overfit (IS/OOS gap < 10%)
-- [ ] Documentation lengkap untuk setup AI agent (LLM API keys, prompts)
+- [x] Orchestrator CLI dapat run full cycle tanpa manual intervention
+- [x] AI dapat generate valid strategy code (pass AST validation) in 1-2 attempts
+- [x] AI dapat analyze results dan propose refinement dengan reasoning clear
+- [x] Memory system dapat track 5+ iterations dengan lineage jelas
+- [x] Walk-forward test menunjukkan AI tidak overfit (IS/OOS gap < 10%)
+- [x] Documentation lengkap untuk setup AI agent (LLM API keys, prompts)
 
 ### Anti-Hallucination Validation:
-- [ ] AI tidak assume data yang tidak ada di file
-- [ ] AI tidak generate random parameters tanpa reasoning
-- [ ] AI tidak claim performance improvement tanpa backtest evidence
-- [ ] AI dapat recover dari errors dalam max 3 attempts
-- [ ] AI learning terdokumentasi dan traceable di memory.json
+- [x] AI tidak assume data yang tidak ada di file
+- [x] AI tidak generate random parameters tanpa reasoning
+- [x] AI tidak claim performance improvement tanpa backtest evidence
+- [x] AI dapat recover dari errors dalam max 3 attempts
+- [x] AI learning terdokumentasi dan traceable di memory.json
